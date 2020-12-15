@@ -8,15 +8,6 @@ STL/
 ### firmware hard backup ###
 firmware/*.rar
 
-### python_src ###
-firmware/python_src/output/
-
-### Face2Header
-firmware/Face2Header/output/
-
-### image output###
-firmware/image/Jpg/
-
 ### old firmware ###
 firmware/00.old/
 
