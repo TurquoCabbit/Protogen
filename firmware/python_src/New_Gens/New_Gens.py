@@ -3,9 +3,9 @@ import uuid
 from PIL import ImageDraw
 
 protogen_name = input('Hellowo!!\nplease enter New Protogen name：')
-color_R = input('please enter color R：')
-color_G = input('please enter color G：')
-color_B = input('please enter color B：')
+color_R = input('please enter faceture color R：')
+color_G = input('please enter faceture color G：')
+color_B = input('please enter faceture color B：')
 
 folder_list = os.listdir('../../image/Jpg')
 if len(folder_list):
