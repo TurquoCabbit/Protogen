@@ -21,10 +21,11 @@ while(True):
         protogen = input('ENTER NUMBER：')
         continue
     if protogen < len(protogen_list):
-        pixel_color = 'rgb' + protogen_list[protogen].split('\t')[1].split('\n')[0]
+        pixel_color = 'rgb' + protogen_list[protogen].split('\t')[1]
         protogen_path = protogen_list[protogen].split('\t')[0] + '/'
         protogen_name = protogen_list[protogen].split('\t')[0].split('. ')[1]
         protogen_ID = protogen_list[protogen].split('.')[0]
+        remote_theme_path = protogen_list[protogen].split('\t')[2].split('\n')[0] + '/'
         break
     else:
         print("We don't have that boi here yet")
@@ -59,7 +60,7 @@ mouth_array = []
 
 for ws in range(10 ,sheet_num):    
     face_name = wb[wb.worksheets[ws].title]['E38'].value
-    save_path = '../../image/Jpg/' + protogen_path + 'Face/{:0>2d}_'.format(ws - 10) + face_name + '.png'
+    save_path = '../../image/Jpg/' + protogen_path + '{:0>2d}_'.format(ws - 10) + face_name + '.png'
     eye_array = wb[wb.worksheets[ws].title]['X12'].value.split(',', 16)
     nose_array = wb[wb.worksheets[ws].title]['N10'].value.split(',', 8)
     mouth_array = wb[wb.worksheets[ws].title]['E30'].value.split(',', 32)
@@ -104,11 +105,11 @@ wb.close()
 
 ##################################################################################################
 
-jpg_list_Batt = os.listdir('../../image/Jpg/' + protogen_path + 'Batt/')
-jpg_list_BLE = os.listdir('../../image/Jpg/' + protogen_path + 'BLE/')
-jpg_list_Face = os.listdir('../../image/Jpg/' + protogen_path + 'Face/')
-jpg_list_Lit = os.listdir('../../image/Jpg/' + protogen_path + 'Lit/')
-jpg_list_Sig = os.listdir('../../image/Jpg/' + protogen_path + 'Sig/')
+jpg_list_Batt = os.listdir('../../image/color_theme/' + remote_theme_path + 'Batt/')
+jpg_list_BLE = os.listdir('../../image/color_theme/' + remote_theme_path + 'BLE/')
+jpg_list_Face = os.listdir('../../image/Jpg/' + protogen_path)
+jpg_list_Lit = os.listdir('../../image/color_theme/' + remote_theme_path + 'Lit/')
+jpg_list_Sig = os.listdir('../../image/color_theme/' + remote_theme_path + 'Sig/')
 
 file_image = open('../output/image.h', 'w')
 
@@ -118,7 +119,7 @@ file_image.write('//' + time + '\t\t' + protogen_ID + '_' + protogen_name + '\n\
 ##################################################################################################
 file_image.write('const uint16_t Batt[][6750] = {')
 for j in jpg_list_Batt:
-    im = Image.open('../../image/Jpg/' + protogen_path + 'Batt/' + j)
+    im = Image.open('../../image/color_theme/' + remote_theme_path + 'Batt/' + j)
     im = im.transpose(Image.FLIP_LEFT_RIGHT)
     im = im.transpose(Image.ROTATE_90)
 
@@ -143,7 +144,7 @@ file_image.write('\n};\n\n')
 
 ##################################################################################################
 file_image.write('const uint16_t Connected[6750] = {')
-im = Image.open('../../image/Jpg/' + protogen_path + 'BLE/Connected.jpg')
+im = Image.open('../../image/color_theme/' + remote_theme_path + 'BLE/Connected.jpg')
 im = im.transpose(Image.FLIP_LEFT_RIGHT)
 im = im.transpose(Image.ROTATE_90)
 
@@ -166,7 +167,7 @@ file_image.write('};\n')
 
 ##################################################################################################
 file_image.write('const uint16_t Unconnected[6750] = {')
-im = Image.open('../../image/Jpg/' + protogen_path + 'BLE/Unconnected.jpg')
+im = Image.open('../../image/color_theme/' + remote_theme_path + 'BLE/Unconnected.jpg')
 im = im.transpose(Image.FLIP_LEFT_RIGHT)
 im = im.transpose(Image.ROTATE_90)
 pixels = im.load() # this is not a list, nor is it list()'able
@@ -188,7 +189,7 @@ file_image.write('};\n\n')
 
 ##################################################################################################
 file_image.write('const uint16_t Max_lit[6750] = {')
-im = Image.open('../../image/Jpg/' + protogen_path + 'Lit/Max_lit.jpg')
+im = Image.open('../../image/color_theme/' + remote_theme_path + 'Lit/Max_lit.jpg')
 im = im.transpose(Image.FLIP_LEFT_RIGHT)
 im = im.transpose(Image.ROTATE_90)
 pixels = im.load() # this is not a list, nor is it list()'able
@@ -210,7 +211,7 @@ file_image.write('};\n\n')
 
 ##################################################################################################
 file_image.write('const uint16_t general_lit[6750] = {')
-im = Image.open('../../image/Jpg/' + protogen_path + 'Lit/general_lit.jpg')
+im = Image.open('../../image/color_theme/' + remote_theme_path + 'Lit/general_lit.jpg')
 im = im.transpose(Image.FLIP_LEFT_RIGHT)
 im = im.transpose(Image.ROTATE_90)
 pixels = im.load() # this is not a list, nor is it list()'able
@@ -233,7 +234,7 @@ file_image.write('};\n\n')
 ##################################################################################################
 file_image.write('const uint16_t Signature[][32400] = {')
 for j in jpg_list_Sig:
-    im = Image.open('../../image/Jpg/' + protogen_path + 'Sig/' + j)
+    im = Image.open('../../image/color_theme/' + remote_theme_path + 'Sig/' + j)
     im = im.transpose(Image.FLIP_LEFT_RIGHT)
     im = im.transpose(Image.ROTATE_90)
 
@@ -259,7 +260,7 @@ file_image.write('\n};\n\n')
 ##################################################################################################
 file_image.write('const uint16_t Face[][18900] = {')
 for j in jpg_list_Face:
-    im = Image.open('../../image/Jpg/' + protogen_path + 'Face/' + j)
+    im = Image.open('../../image/Jpg/' + protogen_path + j)
     im = im.transpose(Image.FLIP_LEFT_RIGHT)
     im = im.transpose(Image.ROTATE_90)
 
