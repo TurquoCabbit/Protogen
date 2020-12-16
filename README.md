@@ -1,9 +1,9 @@
 # Protogen By Turquo Cabbit and Wolfgasm
 
-* ## Run /firmware/Face2header/New_Gens/New_Gens.exe to add new PROTOGENs
+* ## Run /firmware/Face2header/APP/New_Gens.exe to add new PROTOGENs
     * ### Enter name, color code, and remote theme number
 
-* ## Then Run /firmware/Face2header/Face2header/Face2header.exe to generate header files whitch content UUID for BLE and Faceture bitmap
+* ## Then Run /firmware/Face2header/APP/Face2header.exe to generate header files whitch content UUID for BLE and Faceture bitmap
     * ### Faceture was been set in /firmware/Face2header/LED Matrix.xlsx
 
 * ## Program /firmware/Protogen_matrixs/Protogen_matrixs.ino in to ESP32 at PROTOGEN_HEAD
@@ -15,9 +15,10 @@
 
 * ## TO DO
     * ### PROTOGEN_HEAD
-        1. ### Faceture dittering
+        1. ### Geather scrpt into fuction in Face2header.exe
+        2. ### Faceture dittering
             * #### even during blinking
-        2. ### Vocal sampling
+        3. ### Vocal sampling
             * #### use LM386 for mic amp
             * #### and to speaker
 

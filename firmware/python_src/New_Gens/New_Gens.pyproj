@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>New_Gens</Name>
     <RootNamespace>New_Gens</RootNamespace>
-    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
+    <InterpreterId>Global|VisualStudio|python 7.5</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,8 +25,7 @@
     <Compile Include="New_Gens.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|3.6" />
-    <InterpreterReference Include="Global|PythonCore|3.8-32-32" />
+    <InterpreterReference Include="Global|VisualStudio|python 7.5" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
