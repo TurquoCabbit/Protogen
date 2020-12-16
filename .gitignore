@@ -20,7 +20,6 @@ firmware/ProtoGun/build_temp/
 ### PCB file ###
 PCB/ref/
 PCB/ver1/
-PCB/ver2/
 
 ### Altium ###
 *.PrjPCBStructure
