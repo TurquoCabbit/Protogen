@@ -36,7 +36,7 @@ QueueHandle_t queue_BLE;
 QueueHandle_t queue_VM;
 QueueHandle_t queue_GUI;
 
-void queue_init(void)
+inline void queue_init(void)
 {
 	queue_Fan = xQueueCreate(1, 1);       //1 items, 1 byte each
 	queue_ADC = xQueueCreate(1, 1);       //1 items, 1 byte each

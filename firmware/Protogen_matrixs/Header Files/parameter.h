@@ -48,7 +48,7 @@ QueueHandle_t queue_Fan;
 QueueHandle_t queue_Ctrl;
 QueueHandle_t queue_BLE;
 
-void queue_init(void)
+inline void queue_init(void)
 {
 	queue_Neopixel = xQueueCreate(1, 1);	//1 items, 1 byte each
 	queue_Matrix = xQueueCreate(1, 1);		//1 items, 1 byte each
