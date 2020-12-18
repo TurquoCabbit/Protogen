@@ -1,5 +1,6 @@
 import os
 import uuid
+import shutil
 from PIL import ImageDraw
 
 def color_threshold(color_in):
@@ -11,22 +12,57 @@ def color_threshold(color_in):
     else:
         return '255'
 
-def do_rename():
+def do_rename(protogen, new_name):
+    #delete jpg file
+    #modify protogen_list
+
+    #### still don't fucking work
+    protogen_number = protogen.split('.')[0]
+    list = open('../Protogen_list.txt', 'r')
+    list_new = open('../Protogen_list_bak.txt', 'w')
+    for i in list:
+        if i.split('.')[0] == protogen_number:
+            i = i.replace(protogen.split('.')[1], new_name)
+        
+        list_new.write(i)
+    
+    list_new.close
+    list.close
+
+
+    os.system('PAUSE')
+    list.seek(0)
+    
+
+    shutil.rmtree('../../image/Jpg/' + protogen)
     print('do_renamd')
     os.system("PAUSE")
     return True
 
-def do_recolor():
+def do_recolor(protogen):
+    #delete jpg file
+    #modify protogen_list
+    
+    shutil.rmtree('../../image/Jpg/' + protogen)
     print('do_recolor')
     os.system("PAUSE")
     return True
 
-def do_retheme():
+def do_retheme(protogen):
+    #delete jpg file
+    #modify protogen_list
+    
+    shutil.rmtree('../../image/Jpg/' + protogen)
     print('do_retheme')
     os.system("PAUSE")
     return True
 
-def do_delete():
+def do_delete(protogen):
+    #delete jpg file   (shift protogen number)
+    #modify protogen_list   (shift protogen number)
+    #modify UUID file   (shift protogen number)
+    
+    shutil.rmtree('../../image/Jpg/' + protogen)
     print('do_delete')
     os.system("PAUSE")
     return True
@@ -146,7 +182,7 @@ else:
             print('Goning to rename ' + protogen_name + ' as ' + new_name)
             confirm = input('Enter any thing to confirm or -b to discard : ')
             if confirm != '-b' and confirm != '-B':
-                if do_rename() != True:
+                if do_rename(protogen_path, new_name) != True:
                     print("There's some error occurred during the process")
                 else:
                     print('Rename successfully')
@@ -174,7 +210,7 @@ else:
             print('Goning to change faceture color from : ' + pixel_color_R + ',' + pixel_color_G + ',' + pixel_color_B + ' to : ' + new_color_R + ',' + new_color_G + ',' + new_color_B)
             confirm = input('Enter any thing to confirm or -b to discard : ')
             if confirm != '-b' and confirm != '-B':
-                if do_recolor() != True:
+                if do_recolor(protogen_path) != True:
                     print("There's some error occurred during the process")
                 else:
                     print('Change faceture color successfully')
@@ -199,7 +235,7 @@ else:
             print('Goning to change color theme from : ' + remote_theme_path + ' to : ' + new_theme_path)
             confirm = input('Enter any thing to confirm or -b to discard : ')
             if confirm != '-b' and confirm != '-B':
-                if do_retheme() != True:
+                if do_retheme(protogen_path) != True:
                     print("There's some error occurred during the process")
                 else:
                     print('Change color theme successfully')
@@ -211,7 +247,7 @@ else:
             if confirm == 'y' or confirm == 'Y':
                 confirm = input('Enter ' + protogen_name + ' to confirm : ')
                 if confirm == protogen_name:
-                    if do_delete() != True:
+                    if do_delete(protogen_path) != True:
                         print("There's some error occurred during the process")
                         cmd = '-b'
                         continue 
