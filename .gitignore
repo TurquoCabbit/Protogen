@@ -13,9 +13,11 @@ firmware/00.old/
 
 ### Protogen_Matrix ###
 firmware/Protogen_matrixs/build_temp/
+firmware/Protogen_matrixs/.vscode/
 
 ### ProtoGun ###
 firmware/ProtoGun/build_temp/
+firmware/ProtoGun/.vscode/
 
 ### PCB file ###
 PCB/ref/
