@@ -1,6 +1,6 @@
 #include <esp_task_wdt.h>
 #include <driver/adc.h>
-#include <TFT_eFEX.h>
+#include <TFT_eSPI.h>
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>

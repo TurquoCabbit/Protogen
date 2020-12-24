@@ -1,13 +1,7 @@
-#ifndef ARDUINO
-#define ARDUINO 108012
-#endif
-
 #include <esp_task_wdt.h>
 #include <Wire.h>
 #include <BLEDevice.h>
-//#include "BLEScan.h"
 #include <EEPROM.h>
-
 #include <WS2812FX.h>
 #include <WS2812Driver.h>
 #include <Adafruit_LEDBackpack.h>
