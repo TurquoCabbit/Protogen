@@ -15,28 +15,24 @@ def color_threshold(color_in):
 def do_rename(protogen, new_name):
     #delete jpg file
     #modify protogen_list
-
-    #### still don't fucking work
     protogen_number = protogen.split('.')[0]
     list = open('../Protogen_list.txt', 'r')
     list_new = open('../Protogen_list_bak.txt', 'w')
     for i in list:
         if i.split('.')[0] == protogen_number:
-            i = i.replace(protogen.split('.')[1], new_name)
+            i = i.replace(protogen.split('. ')[1], new_name)
         
         list_new.write(i)
     
-    list_new.close
-    list.close
-
-
-    os.system('PAUSE')
-    list.seek(0)
+    list_new.close()
+    list.close()
     
+    os.remove('../Protogen_list.txt')
+    os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
 
-    shutil.rmtree('../../image/Jpg/' + protogen)
-    print('do_renamd')
-    os.system("PAUSE")
+    if os.path.isdir('../../image/Jpg/' + protogen):
+        shutil.rmtree('../../image/Jpg/' + protogen)
+
     return True
 
 def do_recolor(protogen):
@@ -186,7 +182,7 @@ else:
                     print("There's some error occurred during the process")
                 else:
                     print('Rename successfully')
-            cmd = '-b'
+            cmd = '-i'
             continue               
 
         elif cmd == '-c' or cmd == '-C':
@@ -214,7 +210,7 @@ else:
                     print("There's some error occurred during the process")
                 else:
                     print('Change faceture color successfully')
-            cmd = '-b'
+            cmd = '-i'
             continue 
 
         elif cmd == '-t' or cmd == '-T':
@@ -239,7 +235,7 @@ else:
                     print("There's some error occurred during the process")
                 else:
                     print('Change color theme successfully')
-            cmd = '-b'
+            cmd = '-i'
             continue 
 
         elif cmd == '-d' or cmd == '-D':
@@ -249,7 +245,7 @@ else:
                 if confirm == protogen_name:
                     if do_delete(protogen_path) != True:
                         print("There's some error occurred during the process")
-                        cmd = '-b'
+                        cmd = '-i'
                         continue 
                     else:
                         print('DELET Ptotoen successfully')
