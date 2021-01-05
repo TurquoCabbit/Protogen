@@ -3,7 +3,7 @@ import uuid
 import shutil
 from PIL import ImageDraw
 
-for_testing = True
+for_testing = False
 cmd = '-i'
 
 def test_pause():
@@ -20,133 +20,143 @@ def color_threshold(color_in):
         return '255'
 
 def do_rename(protogen, new_name):
-    #delete jpg file
+    #rename jpg folder
     #modify protogen_list
-    protogen_number = protogen.split('.')[0]
-    list = open('../Protogen_list.txt', 'r')
-    list_new = open('../Protogen_list_bak.txt', 'w')
-    for i in list:
-        if i.split('.')[0] == protogen_number:
-            i = i.replace(i.split('\t', 2)[0], protogen_number + '. ' + new_name)
+    try:
+        protogen_number = protogen.split('.')[0]
+        list = open('../Protogen_list.txt', 'r')
+        list_new = open('../Protogen_list_bak.txt', 'w')
+        for i in list:
+            if i.split('.')[0] == protogen_number:
+                i = i.replace(i.split('\t', 2)[0], protogen_number + '. ' + new_name)
+            
+            list_new.write(i)
         
-        list_new.write(i)
-    
-    list_new.close()
-    list.close()
+        list_new.close()
+        list.close()
 
-    test_pause()
-    os.remove('../Protogen_list.txt')
-    os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
+        test_pause()
+        os.remove('../Protogen_list.txt')
+        os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
 
-    if os.path.isdir('../../image/Jpg/' + protogen):
-        shutil.rmtree('../../image/Jpg/' + protogen)
+        if os.path.isdir('../../image/Jpg/' + protogen):
+            shutil.rmtree('../../image/Jpg/' + protogen)
+            os.mkdir('../../image/Jpg/' + protogen_number + '. ' + new_name)
 
-    return True
+        return True
+    except:
+        return False
 
 def do_recolor(protogen, R, G, B):
     #delete jpg file
     #modify protogen_list
-    protogen_number = protogen.split('.')[0]
-    list = open('../Protogen_list.txt', 'r')
-    list_new = open('../Protogen_list_bak.txt', 'w')
-    for i in list:
-        if i.split('.')[0] == protogen_number:
-            i = i.replace(i.split('\t', 2)[1], '(' + R + ',' + G + ',' + B + ')')
+    try:
+        protogen_number = protogen.split('.')[0]
+        list = open('../Protogen_list.txt', 'r')
+        list_new = open('../Protogen_list_bak.txt', 'w')
+        for i in list:
+            if i.split('.')[0] == protogen_number:
+                i = i.replace(i.split('\t', 2)[1], '(' + R + ',' + G + ',' + B + ')')
+            
+            list_new.write(i)
         
-        list_new.write(i)
-    
-    list_new.close()
-    list.close()
+        list_new.close()
+        list.close()
 
-    test_pause()
-    os.remove('../Protogen_list.txt')
-    os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
+        test_pause()
+        os.remove('../Protogen_list.txt')
+        os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
 
-    if os.path.isdir('../../image/Jpg/' + protogen):
-        shutil.rmtree('../../image/Jpg/' + protogen)
+        if os.path.isdir('../../image/Jpg/' + protogen):
+            shutil.rmtree('../../image/Jpg/' + protogen)
+            os.mkdir('../../image/Jpg/' + protogen)
 
-    return True
+        return True
+    except:
+        return False
 
 def do_retheme(protogen, theme):
     #delete jpg file
     #modify protogen_list
-    protogen_number = protogen.split('.')[0]
-    list = open('../Protogen_list.txt', 'r')
-    list_new = open('../Protogen_list_bak.txt', 'w')
-    for i in list:
-        if i.split('.')[0] == protogen_number:
-            i = i.replace(i.split('\t', 2)[2], theme + '\n')
+    try:
+        protogen_number = protogen.split('.')[0]
+        list = open('../Protogen_list.txt', 'r')
+        list_new = open('../Protogen_list_bak.txt', 'w')
+        for i in list:
+            if i.split('.')[0] == protogen_number:
+                i = i.replace(i.split('\t', 2)[2], theme + '\n')
+            
+            list_new.write(i)
         
-        list_new.write(i)
-    
-    list_new.close()
-    list.close()
+        list_new.close()
+        list.close()
 
-    test_pause()
-    os.remove('../Protogen_list.txt')
-    os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
+        test_pause()
+        os.remove('../Protogen_list.txt')
+        os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
 
-    if os.path.isdir('../../image/Jpg/' + protogen):
-        shutil.rmtree('../../image/Jpg/' + protogen)
+        if os.path.isdir('../../image/Jpg/' + protogen):
+            shutil.rmtree('../../image/Jpg/' + protogen)
+            os.mkdir('../../image/Jpg/' + protogen)
 
-    return True
+        return True
+    except:
+        return False
 
 def do_delete(protogen):
-    #delete jpg file   (shift protogen number)
+    #delete jpg folder   (shift protogen number)
     #modify protogen_list   (shift protogen number)
     #modify UUID file   (shift protogen number)
-    #try:
-    file_list = open('../Protogen_list.txt', 'r')
-    protogen_num = len(file_list.readlines())
-    file_list.close()
-    protogen_serial_to_del = (int)(protogen.split('.')[0])
-    
-    folder_list = os.listdir('../../image/Jpg')
+    try:
+        file_list = open('../Protogen_list.txt', 'r')
+        protogen_num = len(file_list.readlines())
+        file_list.close()
+        protogen_serial_to_del = (int)(protogen.split('.')[0])
+        
+        folder_list = os.listdir('../../image/Jpg')
 
-    for k in range(len(folder_list)):
-        folder_serial = (int)(folder_list[k].split('. ')[0])
-        if folder_serial == protogen_serial_to_del:
-            shutil.rmtree('../../image/Jpg/' + folder_list[k])
-        elif folder_serial > protogen_serial_to_del:
-            os.rename('../../image/Jpg/' + folder_list[k], '../../image/Jpg/{:0>2d}{}'.format(folder_serial - 1, folder_list[k][2:]))
+        for k in range(len(folder_list)):
+            folder_serial = (int)(folder_list[k].split('. ')[0])
+            if folder_serial == protogen_serial_to_del:
+                shutil.rmtree('../../image/Jpg/' + folder_list[k])
+            elif folder_serial > protogen_serial_to_del:
+                os.rename('../../image/Jpg/' + folder_list[k], '../../image/Jpg/{:0>2d}{}'.format(folder_serial - 1, folder_list[k][2:]))
 
-    list_f = open('../Protogen_list.txt', 'r')
-    list = list_f.readlines()
-    list_f.close()
-    list_new = open('../Protogen_list_bak.txt', 'w')
-    UUID_f = open('../output/UUID.txt', 'r')
-    UUID = UUID_f.readlines()
-    UUID_f.close()
-    UUID_new = open('../output/UUID_bak.txt', 'w')
-    for i in range(protogen_num - 1):
-        if(i < protogen_serial_to_del):
-            #keep
-            list_new.write(list[i])
-            for j in range(i * 4, i * 4 + 4):
-                UUID_new.write(UUID[j])
-        else:
-            #shift
-            list[i + 1] =  '{:0>2d}{}'.format(i, list[i + 1][2:])
-            list_new.write(list[i + 1])
-            UUID[(i + 1) * 4] = '{}{:0>2d})\n'.format(UUID[(i + 1) * 4 ][:22], i)
-            for j in range((i + 1) * 4, (i + 1) * 4 + 4):
-                UUID_new.write(UUID[j])
+        list_f = open('../Protogen_list.txt', 'r')
+        list = list_f.readlines()
+        list_f.close()
+        list_new = open('../Protogen_list_bak.txt', 'w')
+        UUID_f = open('../output/UUID.txt', 'r')
+        UUID = UUID_f.readlines()
+        UUID_f.close()
+        UUID_new = open('../output/UUID_bak.txt', 'w')
+        for i in range(protogen_num - 1):
+            if(i < protogen_serial_to_del):
+                #keep
+                list_new.write(list[i])
+                for j in range(i * 4, i * 4 + 4):
+                    UUID_new.write(UUID[j])
+            else:
+                #shift
+                list[i + 1] =  '{:0>2d}{}'.format(i, list[i + 1][2:])
+                list_new.write(list[i + 1])
+                UUID[(i + 1) * 4] = '{}{:0>2d})\n'.format(UUID[(i + 1) * 4 ][:22], i)
+                for j in range((i + 1) * 4, (i + 1) * 4 + 4):
+                    UUID_new.write(UUID[j])
 
-    list_new.close()
-    UUID_new.close()
-    
-    test_pause()
-    
-    os.remove('../Protogen_list.txt')
-    os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
-    os.remove('../output/UUID.txt')
-    os.rename('../output/UUID_bak.txt', '../output/UUID.txt')
-    
-    return True
-    #except:
-        #return False
-
-
+        list_new.close()
+        UUID_new.close()
+        
+        test_pause()
+        
+        os.remove('../Protogen_list.txt')
+        os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
+        os.remove('../output/UUID.txt')
+        os.rename('../output/UUID_bak.txt', '../output/UUID.txt')
+        
+        return True
+    except:
+        return False
 
 ### Flow start
 while(True):
