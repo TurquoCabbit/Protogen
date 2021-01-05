@@ -100,11 +100,20 @@ def do_delete(protogen):
     file_list.close()
     protogen_serial_to_del = (int)(protogen.split('.')[0])
     
-    list = open('../Protogen_list.txt', 'r').readlines()
+    list_f = open('../Protogen_list.txt', 'r')
+    list = list_f.readlines()
+    list_f.close()
     list_new = open('../Protogen_list_bak.txt', 'w')
 
-    UUID = open('../output/UUID.txt', 'r').readlines()
+    UUID_f = open('../output/UUID.txt', 'r')
+    UUID = UUID_f.readlines()
+    UUID_f.close()
     UUID_new = open('../output/UUID_bak.txt', 'w')
+
+    folder_list = os.listdir('../../image/Jpg')
+    if os.path.isdir('../../image/Jpg/' + folder_list[protogen_serial_to_del]):
+        shutil.rmtree('../../image/Jpg/' + folder_list[protogen_serial_to_del])
+
     for i in range(protogen_num - 1):
         if(i < protogen_serial_to_del):
             #keep
@@ -119,12 +128,13 @@ def do_delete(protogen):
             for j in range((i + 1) * 4, (i + 1) * 4 + 4):
                 UUID_new.write(UUID[j])
 
-            #########################################
-            #### lack of delete and remove folder####
-            #########################################
+            if os.path.isdir('../../image/Jpg/' + folder_list[i + 1]):
+                os.rename('../../image/Jpg/' + folder_list[i + 1], '../../image/Jpg/{:0>2d}.{}'.format(i, folder_list[i + 1].split('.')[1]))
+            
     
     list_new.close()
     UUID_new.close()
+    
     test_pause()
     
     os.remove('../Protogen_list.txt')
