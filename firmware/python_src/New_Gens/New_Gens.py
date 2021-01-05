@@ -95,25 +95,29 @@ def do_delete(protogen):
     #delete jpg file   (shift protogen number)
     #modify protogen_list   (shift protogen number)
     #modify UUID file   (shift protogen number)
+    #try:
     file_list = open('../Protogen_list.txt', 'r')
     protogen_num = len(file_list.readlines())
     file_list.close()
     protogen_serial_to_del = (int)(protogen.split('.')[0])
     
+    folder_list = os.listdir('../../image/Jpg')
+
+    for k in range(len(folder_list)):
+        folder_serial = (int)(folder_list[k].split('. ')[0])
+        if folder_serial == protogen_serial_to_del:
+            shutil.rmtree('../../image/Jpg/' + folder_list[k])
+        elif folder_serial > protogen_serial_to_del:
+            os.rename('../../image/Jpg/' + folder_list[k], '../../image/Jpg/{:0>2d}{}'.format(folder_serial - 1, folder_list[k][2:]))
+
     list_f = open('../Protogen_list.txt', 'r')
     list = list_f.readlines()
     list_f.close()
     list_new = open('../Protogen_list_bak.txt', 'w')
-
     UUID_f = open('../output/UUID.txt', 'r')
     UUID = UUID_f.readlines()
     UUID_f.close()
     UUID_new = open('../output/UUID_bak.txt', 'w')
-
-    folder_list = os.listdir('../../image/Jpg')
-    if os.path.isdir('../../image/Jpg/' + folder_list[protogen_serial_to_del]):
-        shutil.rmtree('../../image/Jpg/' + folder_list[protogen_serial_to_del])
-
     for i in range(protogen_num - 1):
         if(i < protogen_serial_to_del):
             #keep
@@ -122,16 +126,12 @@ def do_delete(protogen):
                 UUID_new.write(UUID[j])
         else:
             #shift
-            list[i + 1] =  '{:0>2d}.{}{}'.format((int)(list[i + 1].split('.')[0]) - 1, list[i + 1].split('.')[1], list[i + 1].split('.')[2])
+            list[i + 1] =  '{:0>2d}{}'.format(i, list[i + 1][2:])
             list_new.write(list[i + 1])
-            UUID[(i + 1) * 4] = '{} == {:0>2d})\n'.format(UUID[(i + 1) * 4 ].split('== ')[0], (int)(UUID[(i + 1) * 4 ].split('== ')[1].split(')')[0]) - 1)
+            UUID[(i + 1) * 4] = '{}{:0>2d})\n'.format(UUID[(i + 1) * 4 ][:22], i)
             for j in range((i + 1) * 4, (i + 1) * 4 + 4):
                 UUID_new.write(UUID[j])
 
-            if os.path.isdir('../../image/Jpg/' + folder_list[i + 1]):
-                os.rename('../../image/Jpg/' + folder_list[i + 1], '../../image/Jpg/{:0>2d}.{}'.format(i, folder_list[i + 1].split('.')[1]))
-            
-    
     list_new.close()
     UUID_new.close()
     
@@ -141,7 +141,10 @@ def do_delete(protogen):
     os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
     os.remove('../output/UUID.txt')
     os.rename('../output/UUID_bak.txt', '../output/UUID.txt')
+    
     return True
+    #except:
+        #return False
 
 
 
@@ -171,23 +174,17 @@ while(True):
             remote_theme_path = 0
         remote_theme_path = remote_theme_list[(int)(remote_theme_path)]
 
-        folder_list = os.listdir('../../image/Jpg')
-        if len(folder_list):
-            protogen_ID = (int)(folder_list[-1].split('.')[0]) + 1
-        else:
-            protogen_ID = 0
-
+        file_list = open('../Protogen_list.txt', 'r')
+        protogen_ID = len(file_list.readlines())
+        file_list.close()
         protogen = '{:0>2d}'.format(protogen_ID) + '. ' + protogen_name
-
-        root_path = '../../image/Jpg/'
-        if not os.path.isdir(root_path + protogen):
-            os.mkdir(root_path + protogen)
-
 
         file_list = open('../Protogen_list.txt', 'a')
         file_list.write(protogen + '\t(' + color_R + ',' + color_G + ',' + color_B + ')\t' + remote_theme_path +'\n')
         file_list.close()
 
+        if not os.path.isdir('../../image/Jpg/' + protogen):
+            os.mkdir('../../image/Jpg/' + protogen)
 
         if not os.path.isdir('../output'):
             os.mkdir('../output')
@@ -208,7 +205,7 @@ while(True):
                 file_list.close()
                 print('Choose Protogen：')
                 for i in protogen_list:
-                    print('\t' + i.split('\n')[0].split('\t')[0])
+                    print('\t' + i.split('\n')[0])
 
                 protogen = input('please enter number of whitch Protogen need edit or -e to leave：')
 
@@ -260,7 +257,7 @@ while(True):
                 confirm = input('Enter any thing to confirm or -b to discard : ')
                 if confirm != '-b' and confirm != '-B':
                     if do_rename(protogen_path, new_name) != True:
-                        print("There's some error occurred during the process")
+                        print("There's some error occurred during the process\n")
                     else:
                         print('Rename successfully')
                     cmd = '-i'
@@ -290,7 +287,7 @@ while(True):
                 confirm = input('Enter any thing to confirm or -b to discard : ')
                 if confirm != '-b' and confirm != '-B':
                     if do_recolor(protogen_path, new_color_R, new_color_G, new_color_B) != True:
-                        print("There's some error occurred during the process")
+                        print("There's some error occurred during the process\n")
                     else:
                         print('Change faceture color successfully')
                     cmd = '-i'
@@ -317,7 +314,7 @@ while(True):
                 confirm = input('Enter any thing to confirm or -b to discard : ')
                 if confirm != '-b' and confirm != '-B':
                     if do_retheme(protogen_path, new_theme_path) != True:
-                        print("There's some error occurred during the process")
+                        print("There's some error occurred during the process\n")
                     else:
                         print('Change color theme successfully')
                     cmd = '-i'
@@ -331,7 +328,7 @@ while(True):
                     confirm = input('Enter ' + protogen_name + ' to confirm : ')
                     if confirm == protogen_name:
                         if do_delete(protogen_path) != True:
-                            print("There's some error occurred during the process")
+                            print("There's some error occurred during the process\n")
                             cmd = '-i'
                             continue 
                         else:
