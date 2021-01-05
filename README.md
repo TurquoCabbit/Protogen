@@ -15,19 +15,19 @@
 
 * ## TO DO
     * ### PROTOGEN_HEAD
-        1. ### Geather scrpt into fuction in Face2header.exe
-        2. ### Faceture dittering
+        1. ### Faceture dittering
             * #### even during blinking
-        3. ### Vocal sampling
+        2. ### Vocal sampling
             * #### use LM386 for mic amp
-            * #### and to speaker
+            * #### and to speaker      
+        3. ### Geather scirpt into fuction in Face2header.exe
 
     * ### REMOTE
-        1. ### Edit/Delete Protogen fuction to New_Gens.exe
-        2. ### Offline operation
+        1. ### Offline operation
             1. #### saving
                 * ##### only save remote/blaster related feature
             2. #### reseting
                 * ##### only save remote/blaster related feature
+        2. ### Geather scirpt into fuction in New_gen.exe
 
-#####  2020/12/16
+#####  2021/01/05
