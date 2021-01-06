@@ -159,8 +159,11 @@ def do_delete(protogen):
         return False
 
 ### Flow start
+
+print('Hellowo!!')
+print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 while(True):
-    protogen_name = input('Hellowo!!\nplease enter New Protogen name\nor enter -E to edit Protogens：')
+    protogen_name = input('please enter New Protogen name or enter -E to edit Protogens：')
 
     if protogen_name != '-E' and protogen_name != '-e':
         color_R = input('please enter faceture color R：')
@@ -241,11 +244,12 @@ while(True):
                     else:
                         print("We don't have that boi here yet")
                         protogen = input('please enter again：')
-
+                print('****************************************************************************************************************')
                 print('Name\t: ' + protogen_name)
                 print('Color\t: ' + pixel_color_R + ',' + pixel_color_G + ',' + pixel_color_B)
                 print('Themet\t: ' + remote_theme_path)
-                print('\nCommand : ')
+                print('****************************************************************************************************************')
+                print('Command : ')
                 print('\t-n\t\tRename')
                 print('\t-c\t\tChange faceture color')
                 print('\t-t\t\tChange remote Theme')

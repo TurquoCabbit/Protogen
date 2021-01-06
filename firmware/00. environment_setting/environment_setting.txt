@@ -1,0 +1,17 @@
+00. Arduino Library
+	Decompress libraries.zip to C:\Users\[your username]\Documents\Arduino\
+
+01. ESP32_ram
+	Copy "Mega_app.csv" to C:\Users\[your username]\AppData\Local\Arduino15\packages\esp32\hardware\esp32\1.0.4\tools\partitions
+	Copy "boards.txt" to C:\Users\night\AppData\Local\Arduino15\packages\esp32\hardware\esp32\1.0.4
+
+02. Vscode_ESP32_setting
+	a. Install Arduino IDE
+	b. Install Arduino plugin from Estensions in Vs code
+	c. Fill in Arduino IDE installed path to "Arduino:path" in Vscode setting
+	d. From "\02. Vscode_ESP32_setting\Protogen_matrixs" copy ".vscode" and "build_temp" to  "\firmware\Protogen_matrixs"
+	e. From "\02. Vscode_ESP32_setting\ProtoGun" copy ".vscode" and "build_temp" to  "\firmware\ProtoGun"
+	f. Com port number may be deferent modify it yourself while programing chip
+
+
+Turquo	2021.01.06

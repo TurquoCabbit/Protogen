@@ -1,5 +1,7 @@
 # Protogen By Turquo Cabbit and Wolfgasm
 
+* ## Environment setting guide at /firmware/00. environment_setting
+
 * ## Run /firmware/Face2header/APP/New_Gens.exe to add new PROTOGENs
     * ### Enter name, color code, and remote theme number
 
@@ -30,4 +32,4 @@
                 * ##### only save remote/blaster related feature
         2. ### Geather scirpt into fuction in New_gen.exe
 
-#####  2021/01/05
+#####  Turquo   2021/01/06
