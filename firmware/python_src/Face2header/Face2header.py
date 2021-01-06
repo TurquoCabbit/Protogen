@@ -91,7 +91,7 @@ for ws in range(10 ,sheet_num):
     im_nose = im_nose.rotate(20, resample = Image.BICUBIC, expand = True)
     im_mouth = im_mouth.rotate(10, resample = Image.BICUBIC, expand = True)
 
-    im_empty = Image.open('../../image/Face_empty.png')
+    im_empty = Image.open('../../image/color_theme/' + remote_theme_path + 'Face/Face_empty.png')
     im_empty.paste(im_eye, (55,30), mask = im_eye)
     im_empty.paste(im_nose, (8,78), mask = im_nose)
     im_empty.paste(im_mouth, (24,96), mask = im_mouth)
