@@ -19,10 +19,13 @@
     * ### PROTOGEN_HEAD
         1. ### Faceture dittering
             * #### even during blinking
-        2. ### Vocal sampling
+        2. ### BZ Music
+            * #### driver code
+            * #### makefile (Face2header.exe)
+        3. ### Vocal sampling
             * #### use LM386 for mic amp
             * #### and to speaker      
-        3. ### Geather scirpt into fuction in Face2header.exe
+        4. ### Geather scirpt into fuction in Face2header.exe
 
     * ### REMOTE
         1. ### Offline operation
