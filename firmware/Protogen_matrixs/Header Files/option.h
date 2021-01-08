@@ -13,8 +13,9 @@
 
 //Beep
 #define Beep_mode_init		1	//double beep
-#define Beep_cycle			10   //Blink times
+#define Beep_cycle			10   //how many Blink times
 #define Beep_pitch_init		0x53  //Octave pitch
+#define Beep_interval       50    //interval between each beep in ms
 
 //Protosence
 #define Protosence_on			1

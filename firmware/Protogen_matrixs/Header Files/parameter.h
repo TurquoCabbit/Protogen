@@ -271,6 +271,33 @@ _system Protogen =
 	0							//animate_on
 };
 
+
+typedef struct _sheet
+{
+	uint8_t note;
+	uint8_t octave;
+	uint8_t beat;
+	bool joined;
+}; //note,  octave,  beat,  if joined note
+
+typedef struct _note
+{
+	uint16_t whole;
+	uint16_t half;
+	uint16_t quarter;
+	uint16_t n8th;
+	uint16_t n16th;
+	uint16_t n32th;
+};
+
+typedef struct _music
+{
+	uint16_t tempo;
+	uint16_t length;
+	_sheet *sheet;
+	_note *note;
+};
+
 #define	Matrix_refresh()	Protogen.matrix_refresh = 1
 
 //EEPROM

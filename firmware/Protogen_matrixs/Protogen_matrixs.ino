@@ -12,6 +12,7 @@
 #include "./Header Files/matrix.h"
 #include "./Header Files/Face.h"
 #include "./Header Files/neopixel.h"
+#include "./Header Files/Bz.h"
 #include "./Header Files/music.h"
 #include "./Header Files/BLE.h"
 
@@ -556,17 +557,17 @@ void BZ_task(void * parameter)
 				
 			case BZ_mode_beep:
 				BZ_music(BZ_channel, Protogen.Beep_pitch & 0x0F, Protogen.Beep_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				break;
 
 			case BZ_mode_dobule_beep:
 				BZ_music(BZ_channel, Protogen.Beep_pitch & 0x0F, Protogen.Beep_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, Protogen.Beep_pitch & 0x0F, Protogen.Beep_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				break;
 
@@ -574,7 +575,7 @@ void BZ_task(void * parameter)
 				srand(xTaskGetTickCount());
 				rand_pitch = rand_beep();
 				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				break;
 
@@ -582,11 +583,11 @@ void BZ_task(void * parameter)
 				srand(xTaskGetTickCount());
 				rand_pitch = rand_beep();
 				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				rand_pitch = rand_beep();
 				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				break;
 
@@ -594,15 +595,15 @@ void BZ_task(void * parameter)
 				srand(xTaskGetTickCount());
 				rand_pitch = rand_beep();
 				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				rand_pitch = rand_beep();
 				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				rand_pitch = rand_beep();
 				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(50 / portTICK_PERIOD_MS);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				break;
 				
