@@ -635,7 +635,7 @@ void BZ_task(void * parameter)
 					vTaskDelay(megalovania_note_time[j] / portTICK_PERIOD_MS);
 				}
 				#else // note,  octave,  note_time,  if joined note
-				if(Face_current.piece)
+				if(*(Face_current.piece))
 				{
 					play_now = music_ptr_rack[*(Face_current.piece) - 1];
 					for(i = 1; i < play_now->length; i++)
