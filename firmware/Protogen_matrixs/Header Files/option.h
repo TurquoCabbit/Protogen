@@ -16,6 +16,7 @@
 #define Beep_cycle			10   //how many Blink times
 #define Beep_pitch_init		0x53  //Octave pitch
 #define Beep_interval       50    //interval between each beep in ms
+#define beep_time           100   //in ms
 
 //Protosence
 #define Protosence_on			1

@@ -1,4 +1,3 @@
-#define ring_time 100 //in ms
 #define music_duty 511	//10bit PWM
 
 /*
@@ -50,17 +49,3 @@ void BZ_music(uint8_t chan, uint8_t note, uint8_t octave = 4)
 		ledcWrite(BZ_channel, music_duty);
 	}
 }
-
-inline void _musix_struct_init(_music * music, _sheet * sheet, _note * note)
-{
-	music->sheet = sheet;
-	music->note = note;
-}
-
-/*
-#define music_play
-void music_decode()
-{
-
-}
-*/

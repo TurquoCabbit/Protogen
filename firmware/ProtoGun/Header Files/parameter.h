@@ -58,16 +58,14 @@ inline void queue_init(void)
 #define VM_mode(mode)	xQueueSend(queue_VM, queue_mode + mode, 0)
 #define GUI_mode(mode)	xQueueSend(queue_GUI, queue_mode + mode, 0)
 
-#define use_enum 1
-#if use_enum
-enum Fan_mode
+enum _Fan_mode
 {
 	Fan_mode_boost		= 0xFF,
 	Fan_mode_off		= 0xF0,
 	Fan_mode_general	= 0x00,
 };
 
-enum ADC_mode
+enum _ADC_mode
 {
 	ADC_mode_boost		= 0xFF,
 	ADC_mode_off		= 0xF0,
@@ -75,14 +73,14 @@ enum ADC_mode
 	ADC_mode_calculation
 };
 
-enum Ctrl_mode
+enum _Ctrl_mode
 {
 	Ctrl_mode_boost		= 0xFF,
 	Ctrl_mode_off		= 0xF0,
 	Ctrl_mode_general	= 0x00,
 };
 
-enum BLE_mode
+enum _BLE_mode
 {
 	BLE_mode_boost		= 0xFF,
 	BLE_mode_off		= 0xF0,
@@ -90,7 +88,7 @@ enum BLE_mode
 	BLE_mode_notify,
 };
 
-enum VM_mode
+enum _VM_mode
 {
 	VM_mode_boost		= 0xFF,
 	VM_mode_off			= 0xF0,
@@ -100,7 +98,7 @@ enum VM_mode
 	VM_mode_on_extra,
 };
 
-enum GUI_mode
+enum _GUI_mode
 {
 	GUI_mode_boost				= 0xFF,
  	GUI_mode_save				= 0xFE,
@@ -124,58 +122,6 @@ enum GUI_mode
  	GUI_mode_beep_pitch,
  	GUI_mode_signature			= 0xA0,
 };
-#else
-//Fan mode define
-#define Fan_mode_boost		0xFF
-#define Fan_mode_off		0xF0
-#define Fan_mode_general	0x01
-
-//ADC mode define
-#define ADC_mode_boost			0xFF
-#define ADC_mode_off			0xF0
-#define ADC_mode_general		0x00
-#define ADC_mode_calculation	0x01
-
-//Ctrl mode define
-#define Ctrl_mode_boost		0xFF
-#define Ctrl_mode_off		0xF0
-#define Ctrl_mode_general	0x01
-
-//BLE mode define
-#define BLE_mode_boost		0xFF
-#define BLE_mode_off		0xF0
-#define BLE_mode_notify		0x00
-
-//VM mode define
-#define VM_mode_boost		0xFF
-#define VM_mode_off			0xF0
-#define VM_mode_on_long		0x01
-#define VM_mode_on_short	0x02
-#define VM_mode_on_extra	0x03
-
-//GUI mode define
-#define GUI_mode_boost				0xFF
-#define GUI_mode_off				0xF0
-#define GUI_mode_main				0x01
-#define GUI_mode_setting			0x02
-#define GUI_mode_startface			0x10
-#define GUI_mode_toggleface			GUI_mode_startface + 1
-#define GUI_mode_Matrix_brightness	GUI_mode_startface + 2
-#define GUI_mode_blink				GUI_mode_startface + 3
-#define GUI_mode_beep				GUI_mode_startface + 4
-#define GUI_mode_boop				GUI_mode_startface + 5
-#define GUI_mode_Neo_brightness		GUI_mode_startface + 6
-#define GUI_mode_Fan				GUI_mode_startface + 7
-#define GUI_mode_ADC				GUI_mode_startface + 8
-#define GUI_mode_leave				GUI_mode_startface + 9
-#define GUI_mode_reset				GUI_mode_startface + 10
-#define GUI_mode_signature			0xA0
-#define GUI_mode_beep_mode			0x30
-#define GUI_mode_beep_period		GUI_mode_beep_mode + 1
-#define GUI_mode_beep_pitch			GUI_mode_beep_mode + 2
-#define GUI_mode_save				0xFE
-#define GUI_mode_sleep				0xFD
-#endif
 
 #define GUI_temp32_init		0xFFFF0000
 #define GUI_temp16_init		0xFF00
@@ -202,32 +148,12 @@ typedef struct _system_status
 	uint32_t ADC_gain;
 };
 
-_system_status Blaster =
-{
-	0,	//Power_Low
-	0,	//Power_Break
-	0,	//Fan_ready
-	5,	//Battery
-	1,	//remote
-	0,	//ADC_value
-	Fan_duty_init,	//Fan_duty
-	Face_index_general,	//Face_index
-	Face_index_general,	//Face_startup_index
-	Face_index_general + 1,	//Face_toggle_index
-	Matrix_brightness_init,	//Matrix_Brightness
-	Blink_period_init,	//Blink_period
-	Boop_init,	//Boop
-	Beep_period_init,	//Beep_period
-	Beep_mode_init,	//Beep_mode
-	Neo_brightness_init,//Neo_Brightness
-	ADC_gain_init
-};
+_system_status Blaster;
 
 //EEPROM
 #define EEPROM_SIZE						64
 #define EEPROM_saved					0xAA
-#if use_enum
-enum EEPROM
+enum _EEPROM
 {
 	EEPROM_Addr_Saved,
 	EEPROM_Addr_Fan_duty,
@@ -244,22 +170,6 @@ enum EEPROM
 	EEPROM_Addr_ADC_gain_LH,
 	EEPROM_Addr_ADC_gain_LL,
 };
-#else
-#define EEPROM_Addr_Saved				0
-#define EEPROM_Addr_Fan_duty			1
-#define EEPROM_Addr_Face_startup_index	2
-#define EEPROM_Addr_Face_toggle_index	3
-#define EEPROM_Addr_Matrix_Brightness	4
-#define EEPROM_Addr_Blink_period		5
-#define EEPROM_Addr_Boop				6
-#define EEPROM_Addr_Beep_period			7
-#define EEPROM_Addr_Beep_mode			8
-#define EEPROM_Addr_Neo_brightness		9
-#define EEPROM_Addr_ADC_gain_HH			10
-#define EEPROM_Addr_ADC_gain_HL			11
-#define EEPROM_Addr_ADC_gain_LH			12
-#define EEPROM_Addr_ADC_gain_LL			13
-#endif
 
 inline void EEPROM_Save(void)
 {
@@ -312,4 +222,25 @@ inline void System_Reset(void)
 
 	EEPROM.write(EEPROM_Addr_Saved, 0);
 	EEPROM.commit();
+}
+
+inline void parameter_init(void)
+{
+	Blaster.Power_Low = 0;
+	Blaster.Power_Break = 0;
+	Blaster.Fan_ready = 0;
+	Blaster.Battery = 5;
+	Blaster.remote = 1;
+	Blaster.ADC_value = 0;
+	Blaster.Fan_duty = Fan_duty_init;
+	Blaster.Face_index = Face_index_general;
+	Blaster.Face_startup_index = Face_index_general;
+	Blaster.Face_toggle_index = Face_index_general + 1;
+	Blaster.Matrix_Brightness = Matrix_brightness_init;
+	Blaster.Blink_period = Blink_period_init;
+	Blaster.Boop = Boop_init;
+	Blaster.Beep_period = Beep_period_init;
+	Blaster.Beep_mode = Beep_mode_init;
+	Blaster.Neo_Brightness = Neo_brightness_init;
+	Blaster.ADC_gain = ADC_gain_init;
 }

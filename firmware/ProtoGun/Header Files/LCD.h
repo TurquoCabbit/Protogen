@@ -14,7 +14,6 @@ TFT_eSPI tft = TFT_eSPI();
 #define Face_resume_time	10000
 
 #define setting_list_top	10
-
 const char *Setting_list[setting_list_top + 1] = {
 	" Start UP",
 	" Toggle",
@@ -29,26 +28,31 @@ const char *Setting_list[setting_list_top + 1] = {
 	" Reset"
 };
 
-const char *Leave_list[2] = {
+#define leave_list_top	1
+const char *Leave_list[leave_list_top + 1] = {
 	" Don't\n save",
 	" Save"
 };
 
-const char *Beep_list[3] = {
+#define beep_list_top 2
+const char *Beep_list[beep_list_top + 1] = {
 	" Mode",
 	" Period",
 	" Pitch"
 };
 
-const char *Beep_mode_list[5] = {
+#define beep_mode_list_top 5
+const char *Beep_mode_list[beep_mode_list_top + 1] = {
 	" Single",
 	" Double",
 	" Rand one",
 	" Rand two",
-	" Rand three"
+	" Rand three",
+	" Play Music"
 };
 
-const char *Boop_list[2] = {
+#define boop_list_top 1
+const char *Boop_list[boop_list_top + 1] = {
 	"  OFF",
 	"  ON"
 };

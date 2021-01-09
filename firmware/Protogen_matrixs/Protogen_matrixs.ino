@@ -24,6 +24,8 @@ void setup()
 	#endif
 	gpio_init();
 
+	parameter_init();
+
 	queue_init();
 
 	EEPROM.begin(EEPROM_SIZE);
@@ -542,6 +544,7 @@ void BZ_task(void * parameter)
 	uint8_t mode = 0xFF;
 	uint8_t rand_pitch;
 	uint16_t i, j;
+	_music * play_now;
 	for(;;)
 	{    
 		if(xQueueReceive(queue_BZ, &mode, portMAX_DELAY) == pdTRUE)
@@ -607,7 +610,8 @@ void BZ_task(void * parameter)
 				BZ_music(BZ_channel, 0);
 				break;
 				
-			case BZ_mode_megalovania:
+			case BZ_mode_music:
+				#ifndef newmusic_test
 				for (i = 1; i < megalovania_length; i++)
 				{
 					if (!megalovania[i - 1][3])  //if not last note joined note
@@ -630,6 +634,38 @@ void BZ_task(void * parameter)
 					}
 					vTaskDelay(megalovania_note_time[j] / portTICK_PERIOD_MS);
 				}
+				#else // note,  octave,  note_time,  if joined note
+				if(Face_current.piece)
+				{
+					play_now = music_ptr_rack[*(Face_current.piece) - 1];
+					for(i = 1; i < play_now->length; i++)
+					{
+						if (!play_now->sheet[i - 1].joined)  //if not last note joined note
+						{
+							BZ_music(BZ_channel, play_now->sheet[i - 1].note, play_now->sheet[i - 1].octave);
+						}
+						vTaskDelay(play_now->ring_time / portTICK_PERIOD_MS);
+						if (!play_now->sheet[i].joined)  //if not joined note
+						{
+							ledcWrite(BZ_channel, 0);
+						}
+						j = 0;
+						while (j < 8)
+						{
+							if (play_now->sheet[i].beat >> j)
+							{
+								break;
+							}
+							j++;
+						}
+						vTaskDelay(play_now->note[j] / portTICK_PERIOD_MS);
+					}
+				}
+				else
+				{
+					play_now = (_music *)(ptr_dummy);
+				}
+				#endif
 				break;
 
 			case BZ_mode_save:
@@ -822,7 +858,7 @@ void BLE_task(void * parameter)
 					case CMD_Bz:	//BZ
 						switch (BLE_cmd[BLE_buffer_index] & 0xF0)
 						{
-						case 0x00:	//Beep
+						case 0x00:	//Beep and music
 							BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
 							break;
 						case 0x10:	//mode

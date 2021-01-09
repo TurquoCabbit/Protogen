@@ -76,10 +76,7 @@ inline void queue_init(void)
 #define Ctrl_mode(mode)			xQueueSend(queue_Ctrl, queue_mode + mode, 0)
 #define BLE_mode(mode)			xQueueSend(queue_BLE, queue_mode + mode, 0)
 
-
-#define use_enum 1
-#if use_enum
-enum BZ_mode
+enum _BZ_mode
 {
 	BZ_mode_boost			= 0xFF,
 	BZ_mode_save			= 0xF0,
@@ -91,17 +88,17 @@ enum BZ_mode
 	BZ_mode_rand_one,
 	BZ_mode_rand_two,
 	BZ_mode_rand_three,
-	BZ_mode_megalovania		= 0x20,
+	BZ_mode_music,
 };
 
-enum Fan_mode
+enum _Fan_mode
 {
 	Fan_mode_boost			= 0xFF,
 	Fan_mode_off			= 0x00,
 	Fan_mode_on,
 };
 
-enum Matrix_mode
+enum _Matrix_mode
 {
 	Matrix_mode_boost		= 0xFF,
 	Matrix_mode_brightness	= 0xFE,
@@ -111,7 +108,7 @@ enum Matrix_mode
 	Matrix_mode_vibrate,
 };
 
-enum Eye_mode
+enum _Eye_mode
 {
 	Eye_mode_boost			= 0xFF,
 	Eye_mode_general		= 0x00,
@@ -121,7 +118,7 @@ enum Eye_mode
 	Eye_mode_vibrate,
 };
 
-enum Nose_mode
+enum _Nose_mode
 {
 	Nose_mode_boost			= 0xFF,
 	Nose_mode_general		= 0x00,
@@ -130,7 +127,7 @@ enum Nose_mode
 	Nose_mode_vibrate,
 };
 
-enum Mouth_mode
+enum _Mouth_mode
 {
 	Mouth_mode_boost		= 0xFF,
 	Mouth_mode_general		= 0x00,
@@ -139,7 +136,7 @@ enum Mouth_mode
 	Mouth_mode_vibrate,
 };
 
-enum Neopixel_mode
+enum _Neopixel_mode
 {
 	Neopixel_mode_boost		= 0xFF,
 	Neopixel_mode_general	= 0x00,
@@ -147,82 +144,37 @@ enum Neopixel_mode
 	Neopixel_mode_set,
 };
 
-enum Ctrl_mode
+enum _Ctrl_mode
 {
 	Ctrl_mode_boost			= 0xFF,
 	Ctrl_mode_general		= 0x00,
 };
 
-enum BLE_mode
+enum _BLE_mode
 {
 	BLE_mode_boost			= 0xFF,
 	BLE_mode_reconnect		= 0x00,
 	BLE_mode_notify,
 };
-#else
-//BZ mode define
-#define BZ_mode_boost		0xFF
-#define BZ_mode_beep		0x00
-#define BZ_mode_dobule_beep	0x01
-#define BZ_mode_rand_one	0x02
-#define BZ_mode_rand_two	0x03
-#define BZ_mode_rand_three	0x04
-#define BZ_mode_megalovania	0x10
-#define BZ_mode_save		0xF0
-#define BZ_mode_reset		0xF1
-#define BZ_mode_BLE_set		0xF2
-#define BZ_mode_pitch_set	0xF3
 
-//Fan mode define
-#define Fan_mode_boost	0xFF
-#define Fan_mode_off	0x00
-#define Fan_mode_on		0x01
+void * ptr_dummy;
 
-//Matrix mode define
-#define Matrix_mode_boost				0xFF
-#define Matrix_mode_brightness			0xFE
-#define Matrix_mode_scan				0x00
-#define Matrix_mode_rickroll			0x01
-#define	Matrix_mode_randdot				0x02
-#define Matrix_mode_vibrate				0x03
+typedef struct _sheet
+{
+	uint8_t note;
+	uint8_t octave;
+	uint8_t beat;
+	bool joined;
+}; //note,  octave,  beat,  if joined note
 
-//Eye mode define
-#define Eye_mode_boost			0xFF
-#define Eye_mode_general		0x00
-#define Eye_mode_blink			0x01
-#define Eye_mode_randdot		0x02
-#define Eye_mode_boop			0x03
-#define Eye_mode_vibrate		0x04
-
-//Nose mode define
-#define Nose_mode_boost			0xFF
-#define Nose_mode_general		0x00
-#define Nose_mode_randdot		0x01
-#define Nose_mode_boop			0x02
-#define Nose_mode_vibrate		0x03
-
-//Mouth mode define
-#define Mouth_mode_boost		0xFF
-#define Mouth_mode_general		0x00
-#define Mouth_mode_randdot		0x01
-#define Mouth_mode_rickroll		0x02
-#define Mouth_mode_vibrate		0x03
-
-//Neopixel mode define
-#define Neopixel_mode_boost			0xFF
-#define Neopixel_mode_general		0xF0
-#define Neopixel_mode_Brightness	0x00
-#define Neopixel_mode_set			0x01
-
-//Ctrl mode define
-#define Ctrl_mode_boost     0xFF
-#define Ctrl_mode_general   0x00
-
-//BLE mode define
-#define BLE_mode_boost		0xFF
-#define BLE_mode_reconnect	0x00
-#define BLE_mode_notify		0x01
-#endif
+typedef struct _music
+{
+	_sheet *sheet;
+	uint16_t tempo;
+	uint16_t length;
+	uint16_t note[6];
+	uint8_t ring_time;
+};
 
 typedef struct _cnt
 {
@@ -252,59 +204,15 @@ typedef struct _system
 	bool animate_on;
 };
 
-_cnt cnt = {0, 0, 0, 0, 0};
-
-_system Protogen =
-{
-	1,							//matrix_refresh
-	eye_blink_cycle,			//Blink_period
-	Beep_mode_init,				//Beep_mode
-	Beep_pitch_init,			//Beep_pitch
-	Beep_cycle,					//Beep_period
-	Protosence_on,				//Protosence_flag
-	Matrix_brightness_init,		//Matrix_Brightness
-	0,							//Startup_Face
-	neo_ring_brightness,		//Neo_Brightness
-	1,							//show_eye
-	1,							//show_nose
-	1,							//show_mouth
-	0							//animate_on
-};
-
-
-typedef struct _sheet
-{
-	uint8_t note;
-	uint8_t octave;
-	uint8_t beat;
-	bool joined;
-}; //note,  octave,  beat,  if joined note
-
-typedef struct _note
-{
-	uint16_t whole;
-	uint16_t half;
-	uint16_t quarter;
-	uint16_t n8th;
-	uint16_t n16th;
-	uint16_t n32th;
-};
-
-typedef struct _music
-{
-	uint16_t tempo;
-	uint16_t length;
-	_sheet *sheet;
-	_note *note;
-};
+_cnt cnt;
+_system Protogen;
 
 #define	Matrix_refresh()	Protogen.matrix_refresh = 1
 
 //EEPROM
 #define EEPROM_SIZE						64
 #define EEPROM_saved					0xAA
-#if use_enum
-enum EEPROM
+enum _EEPROM
 {
 	EEPROM_Addr_Saved,
 	EEPROM_Addr_Blink_period,
@@ -316,17 +224,6 @@ enum EEPROM
 	EEPROM_Addr_Startup_Face,
 	EERPON_Addr_Neo_brightness,
 };
-#else
-#define EEPROM_Addr_Saved				0
-#define EEPROM_Addr_Blink_period		1
-#define EEPROM_Addr_Beep_mode			2
-#define EEPROM_Addr_Beep_pitch			3
-#define EEPROM_Addr_Beep_period			4
-#define EEPROM_Addr_Protosence_flag		5
-#define EERPON_Addr_Matrix_brightness	6
-#define EEPROM_Addr_Startup_Face		7
-#define EERPON_Addr_Neo_brightness		8
-#endif
 
 inline void EEPROM_Save(void)
 {
@@ -377,4 +274,27 @@ inline void System_Reset(void)
 
 	EEPROM.write(EEPROM_Addr_Saved, 0);
 	EEPROM.commit();
+}
+
+inline void parameter_init(void)
+{
+	cnt.Blink			= 0;
+	cnt.Beep			= 0;
+	cnt.Protosence	 	= 0;
+	cnt.animate		 	= 0;
+	cnt.BLE_reconnect 	= 0;
+
+	Protogen.matrix_refresh = 1;
+	Protogen.Blink_period = eye_blink_cycle;
+	Protogen.Beep_mode = Beep_mode_init;
+	Protogen.Beep_pitch = Beep_pitch_init;
+	Protogen.Beep_period = Beep_cycle;
+	Protogen.Protosence_flag = Protosence_on;
+	Protogen.Matrix_Brightness = Matrix_brightness_init;
+	Protogen.Startup_Face = 0;
+	Protogen.Neo_Brightness = neo_ring_brightness;
+	Protogen.show_eye = 1;
+	Protogen.show_nose = 1;
+	Protogen.show_mouth = 1;
+	Protogen.animate_on = 0;
 }

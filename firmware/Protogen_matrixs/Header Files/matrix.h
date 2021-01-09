@@ -33,8 +33,9 @@ typedef struct _face
 	uint8_t mouth[32];
 	uint8_t center;
 	uint8_t animate_mode;	//Mode
-	uint8_t animate_time;	//duration
+	uint16_t animate_time;	//duration
 	uint8_t neo[7];	//Mode, speed_H, speed_L, R, G, B, W
+	uint8_t piece;
 };
 
 typedef struct _face_ptr
@@ -44,8 +45,9 @@ typedef struct _face_ptr
 	uint8_t *mouth;
 	uint8_t *center;
 	uint8_t *animate_mode;	//Mode
-	uint8_t *animate_time;	//duration
+	uint16_t *animate_time;	//duration
 	uint8_t *neo;
+	uint8_t *piece;
 };
 
 _face Face_buffer;
@@ -95,6 +97,7 @@ void matrix_face_set(_face * set_face)
 	Face_index.animate_mode = &set_face->animate_mode;
 	Face_index.animate_time = &set_face->animate_time;
 	Face_index.neo = set_face->neo;
+	Face_index.piece = &set_face->piece;
 
 	Face_current.eye = Face_index.eye;
 	Face_current.nose = Face_index.nose;
@@ -103,6 +106,7 @@ void matrix_face_set(_face * set_face)
 	Face_current.animate_mode = Face_index.animate_mode;
 	Face_current.animate_time = Face_index.animate_time;
 	Face_current.neo = Face_index.neo;
+	Face_current.piece = Face_index.piece;
 
 	if (set_face->animate_mode)
 	{

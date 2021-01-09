@@ -24,6 +24,8 @@ void setup()
 	#endif
 	gpio_init();
 
+	parameter_init();
+	
 	queue_init();
 
 	EEPROM.begin(EEPROM_SIZE);
@@ -819,7 +821,7 @@ void GUI_task(void * parameter)
 					show = 0;
 					tft.fillScreen(TFT_BLACK);  // clean screen
 					LCD_show_title(Setting_list, setting_list_index);
-					LCD_show_list(Beep_list, beep_index, 2);
+					LCD_show_list(Beep_list, beep_index, beep_list_top);
 				}
 
 				if (Encoder_down)
@@ -872,7 +874,7 @@ void GUI_task(void * parameter)
 					show = 0;
 					tft.fillScreen(TFT_BLACK);  // clean screen
 					LCD_show_title(Beep_list, beep_index);
-					LCD_show_list(Beep_mode_list, Blaster.Beep_mode, 4);
+					LCD_show_list(Beep_mode_list, Blaster.Beep_mode, beep_mode_list_top);
 				}
 
 				if (Encoder_down)
@@ -1037,7 +1039,7 @@ void GUI_task(void * parameter)
 					show = 0;
 					tft.fillScreen(TFT_BLACK);  // clean screen
 					LCD_show_title(Setting_list, setting_list_index);
-					LCD_show_list(Boop_list, Blaster.Boop, 1);
+					LCD_show_list(Boop_list, Blaster.Boop, boop_list_top);
 				}
 
 				if (Encoder_down)
@@ -1293,7 +1295,7 @@ void GUI_task(void * parameter)
 				if (show)
 				{
 					show = 0;
-					LCD_show_list(Leave_list ,leave_index, 1);
+					LCD_show_list(Leave_list ,leave_index, leave_list_top);
 				}
 
 				if (Encoder_down)
