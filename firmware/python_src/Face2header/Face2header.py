@@ -1,5 +1,6 @@
 ##Face xlsx to header file convertor
 import os
+import shutil
 from datetime import datetime
 from openpyxl import load_workbook
 from shutil import copyfile
@@ -58,7 +59,11 @@ eye_array = []
 nose_array = []
 mouth_array = []
 
-for ws in range(10 ,sheet_num):    
+if os.path.isdir('../../image/Jpg/' + protogen_path):
+    shutil.rmtree('../../image/Jpg/' + protogen_path)
+os.mkdir('../../image/Jpg/' + protogen_path)
+
+for ws in range(11 ,sheet_num):    
     face_name = wb[wb.worksheets[ws].title]['E32'].value
     save_path = '../../image/Jpg/' + protogen_path + '{:0>2d}_'.format(ws - 10) + face_name + '.png'
     eye_array = wb[wb.worksheets[ws].title]['X12'].value.split(',', 16)

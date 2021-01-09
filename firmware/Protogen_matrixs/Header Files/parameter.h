@@ -83,6 +83,7 @@ enum _BZ_mode
 	BZ_mode_reset,
 	BZ_mode_BLE_set,
 	BZ_mode_pitch_set,
+	BZ_mode_OFF,
 	BZ_mode_beep			= 0x00,
 	BZ_mode_dobule_beep,
 	BZ_mode_rand_one,
@@ -202,6 +203,7 @@ typedef struct _system
 	bool show_nose;
 	bool show_mouth;
 	bool animate_on;
+	bool music_playing;
 };
 
 _cnt cnt;
@@ -266,6 +268,7 @@ inline void System_Reset(void)
 	Protogen.show_nose = 1;
 	Protogen.show_mouth = 1;
 	Protogen.animate_on = 0;
+	Protogen.music_playing = 0;
 
 	cnt.Blink = 0;
 	cnt.animate = 0;
@@ -297,4 +300,5 @@ inline void parameter_init(void)
 	Protogen.show_nose = 1;
 	Protogen.show_mouth = 1;
 	Protogen.animate_on = 0;
+	Protogen.music_playing = 0;
 }

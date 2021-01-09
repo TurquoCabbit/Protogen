@@ -545,7 +545,7 @@ void GUI_task(void * parameter)
 				if (Encoder_down)
 				{
 					Encoder_down = 0;
-					if (setting_list_index > 0)
+					if (setting_list_index)
 					{
 						setting_list_index--;
 						show = 1;
@@ -827,7 +827,7 @@ void GUI_task(void * parameter)
 				if (Encoder_down)
 				{
 					Encoder_down = 0;
-					if (beep_index > 0)
+					if (beep_index)
 					{
 						beep_index--;
 						show = 1;
@@ -836,7 +836,7 @@ void GUI_task(void * parameter)
 				else if (Encoder_up)
 				{
 					Encoder_up = 0;
-					if (beep_index < 2)
+					if (beep_index < beep_list_top)
 					{
 						beep_index++;
 						show = 1;
@@ -880,7 +880,7 @@ void GUI_task(void * parameter)
 				if (Encoder_down)
 				{
 					Encoder_down = 0;
-					if (Blaster.Beep_mode > 0)
+					if (Blaster.Beep_mode)
 					{
 						Blaster.Beep_mode--;
 						show = 1;
@@ -889,7 +889,7 @@ void GUI_task(void * parameter)
 				else if (Encoder_up)
 				{
 					Encoder_up = 0;
-					if (Blaster.Beep_mode < 4)
+					if (Blaster.Beep_mode < beep_mode_list_top)
 					{
 						Blaster.Beep_mode++;
 						show = 1;
@@ -1054,7 +1054,7 @@ void GUI_task(void * parameter)
 				else if (Encoder_up)
 				{
 					Encoder_up = 0;
-					if (!Blaster.Boop)
+					if (Blaster.Boop < boop_list_top)
 					{
 						Blaster.Boop = 1;
 						show = 1;
@@ -1310,7 +1310,7 @@ void GUI_task(void * parameter)
 				else if (Encoder_up)
 				{
 					Encoder_up = 0;
-					if (!leave_index)
+					if (leave_index < leave_list_top)
 					{
 						leave_index = 1;
 						show = 1;

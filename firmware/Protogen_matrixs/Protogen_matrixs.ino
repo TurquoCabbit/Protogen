@@ -557,6 +557,12 @@ void BZ_task(void * parameter)
 				Serial.println("BZ_mode_boost");
 				#endif
 				break;
+
+			case BZ_mode_OFF:
+				play_now = (_music *)(ptr_dummy);
+				ledcWrite(BZ_channel, 0);
+				Protogen.music_playing = 0;
+				break;
 				
 			case BZ_mode_beep:
 				BZ_music(BZ_channel, Protogen.Beep_pitch & 0x0F, Protogen.Beep_pitch >> 4);
@@ -618,7 +624,7 @@ void BZ_task(void * parameter)
 					{
 						BZ_music(BZ_channel, megalovania[i][0], megalovania[i][1]);
 					}
-					vTaskDelay(ring_time / portTICK_PERIOD_MS);
+					vTaskDelay(beep_time / portTICK_PERIOD_MS);
 					if (!megalovania[i][3])  //if not joined note
 					{
 						ledcWrite(BZ_channel, 0);
@@ -638,11 +644,12 @@ void BZ_task(void * parameter)
 				if(*(Face_current.piece))
 				{
 					play_now = music_ptr_rack[*(Face_current.piece) - 1];
+					Protogen.music_playing = 1;
 					for(i = 1; i < play_now->length; i++)
 					{
-						if (!play_now->sheet[i - 1].joined)  //if not last note joined note
+						if (!play_now->sheet[i - 1].joined)  //if last note not joined note
 						{
-							BZ_music(BZ_channel, play_now->sheet[i - 1].note, play_now->sheet[i - 1].octave);
+							BZ_music(BZ_channel, play_now->sheet[i].note, play_now->sheet[i].octave);
 						}
 						vTaskDelay(play_now->ring_time / portTICK_PERIOD_MS);
 						if (!play_now->sheet[i].joined)  //if not joined note
@@ -652,19 +659,17 @@ void BZ_task(void * parameter)
 						j = 0;
 						while (j < 8)
 						{
-							if (play_now->sheet[i].beat >> j)
+							if (play_now->sheet[i].beat >> j == 0x01)
 							{
 								break;
 							}
 							j++;
 						}
-						vTaskDelay(play_now->note[j] / portTICK_PERIOD_MS);
+						vTaskDelay((play_now->note[j] - play_now->ring_time) / portTICK_PERIOD_MS);
 					}
+					Protogen.music_playing = 0;
 				}
-				else
-				{
-					play_now = (_music *)(ptr_dummy);
-				}
+				BZ_mode(BZ_mode_OFF);
 				#endif
 				break;
 
@@ -744,7 +749,10 @@ void Ctrl_task(void * parameter)
 							if (cnt.Beep >= Protogen.Beep_period)
 							{
 								cnt.Beep = 0;
-								BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
+								if(!Protogen.music_playing)
+								{
+									BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
+								}
 							}
 							else
 							{
