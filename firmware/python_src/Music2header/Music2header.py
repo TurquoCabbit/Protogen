@@ -2,6 +2,7 @@
 import os
 from datetime import datetime
 from openpyxl import load_workbook
+from shutil import copyfile
 
 
 pitch_array = ['0', 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B']
@@ -29,13 +30,44 @@ for ws in range(2 ,work_sheet_num):
 
     file_music.write('_sheet {}_sheet[{}] = \n'.format(music_name, length + 1))
     file_music.write('{\n\t')
-    file_music.write('{00, 04, 16, 00}, \n')
+    file_music.write('{0, 4, 16, 0}, \n')
     
     for i in range(2, length + 2):
         file_music.write('\t{')
-        file_music.write('{:0>2d}, '.format(pitch_conv(work_sheet['B{}'.format(i)].value)))
-        file_music.write('{:0>2d}, '.format(work_sheet['C{}'.format(i)].value))
-        file_music.write('{:0>2d}, '.format(work_sheet['D{}'.format(i)].value))
-        file_music.write('{:0>2d}'.format(work_sheet['E{}'.format(i)].value))
+        file_music.write('{}, '.format(pitch_conv(work_sheet['B{}'.format(i)].value)))
+        file_music.write('{}, '.format(work_sheet['C{}'.format(i)].value))
+        file_music.write('{}, '.format(work_sheet['D{}'.format(i)].value))
+        file_music.write('{}'.format(work_sheet['E{}'.format(i)].value))
         file_music.write('},\n')
     file_music.write('};\n')
+    file_music.write('_music {}'.format(music_name))
+    file_music.write(' = \n{\n')
+    file_music.write('\t{}_sheet,\n'.format(music_name))
+    file_music.write('\t{},\n'.format(tempo))
+    file_music.write('\t{},\n'.format(length + 1))
+    file_music.write('\t{\n')
+    file_music.write('\t\t{},\t\t//whole\n'.format(240000 // tempo))
+    file_music.write('\t\t{},\t\t//half\n'.format(120000 // tempo))
+    file_music.write('\t\t{},\t\t//quarter\n'.format(60000 // tempo))
+    file_music.write('\t\t{},\t\t//8th\n'.format(30000 // tempo))
+    file_music.write('\t\t{},\t\t//16th\n'.format(15000 // tempo))
+    file_music.write('\t\t{},\t\t\t//32th\n'.format(7500 // tempo))
+    file_music.write('\t},\n')
+    file_music.write('\t{},\n'.format(ring_time))
+    file_music.write('};\n\n')
+
+file_music.write('_music * music_ptr_rack[] =\n{\n')
+ser = 0
+for ws in range(2 ,work_sheet_num):
+    work_sheet = wb[wb.worksheets[ws].title]
+    music_name = work_sheet['G1'].value
+    ser += 1
+    file_music.write('\t(_music *)(&{}),\t\t//0x{:0>2d}\n'.format(music_name, ser))
+file_music.write('};')
+
+file_music.close()
+wb.close()
+
+copyfile('../output/music.h', '../../Protogen_matrixs/Header Files/music.h')
+
+os.system('pause')

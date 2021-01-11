@@ -1,13 +1,13 @@
-//2021/01/11 14:11:37		00_Spoon
+//2021/01/11 23:51:05		00_Spoon
 
 #define ProtoGen_ID	00
 #if 0
 #elif (ProtoGen_ID == 00)
-	#define SERVICE_UUID "5008e8ff-8b1d-44eb-bdac-7b574fb7607e"
-	#define CHARACTERISTIC_UUID "c854f213-6577-498a-8b84-db4e014427bc"
+	#define SERVICE_UUID "70311a6d-be67-4885-8e14-16ef71116b04"
+	#define CHARACTERISTIC_UUID "41926ae3-8840-4e3f-a84a-ee9fd45e9993"
 	#define ProtoGun_Name "ProtoBlaster_00"
 #elif (ProtoGen_ID == 01)
-	#define SERVICE_UUID "49950fa5-3cc0-4c1f-86a8-6f86a8977b91"
-	#define CHARACTERISTIC_UUID "0e26662f-762c-4c04-994a-22fd392330c0"
+	#define SERVICE_UUID "cb251895-5de4-4d92-8743-e6e374df3200"
+	#define CHARACTERISTIC_UUID "16b17058-d34b-4e8b-8120-3ba39de3054a"
 	#define ProtoGun_Name "ProtoBlaster_01"
 #endif

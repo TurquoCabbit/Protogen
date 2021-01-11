@@ -39,8 +39,8 @@ file_face.write('//' + time + '\t\t' + protogen_ID + '_' + protogen_name + '\n\n
 
 wb = load_workbook(filename = '../Configure/{}LED_Matrix.xlsx'.format(protogen_path), data_only = True, read_only = True)
 sheet_num = len(wb.worksheets)
-
-for ws in range(11 ,sheet_num):
+start_sheet = 11
+for ws in range(start_sheet ,sheet_num):
     value = wb[wb.worksheets[ws].title]['E33'].value
     file_face.write(value)
     file_face.write('\n')
@@ -48,9 +48,9 @@ for ws in range(11 ,sheet_num):
 file_face.write('\n')
 file_face.write('_face * face_ptr_rack[] =\n{\n')
 
-for ws in range(11 ,sheet_num):
+for ws in range(start_sheet ,sheet_num):
     value = wb[wb.worksheets[ws].title]['E32'].value
-    file_face.write('\t(_face *)(&Face_' + value + '),\t\t//' + hex(ws - 10) + '\n')
+    file_face.write('\t(_face *)(&Face_' + value + '),\t\t//' + hex(ws - start_sheet) + '\n')
         
 file_face.write('\n};')
 file_face.close()
@@ -63,7 +63,7 @@ if os.path.isdir('../../image/Jpg/' + protogen_path):
     rmtree('../../image/Jpg/' + protogen_path)
 os.mkdir('../../image/Jpg/' + protogen_path)
 
-for ws in range(11 ,sheet_num):    
+for ws in range(start_sheet ,sheet_num):    
     face_name = wb[wb.worksheets[ws].title]['E32'].value
     save_path = '../../image/Jpg/' + protogen_path + '{:0>2d}_'.format(ws - 10) + face_name + '.png'
     eye_array = wb[wb.worksheets[ws].title]['X12'].value.split(',', 16)

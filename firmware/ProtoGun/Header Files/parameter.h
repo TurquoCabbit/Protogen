@@ -209,9 +209,9 @@ inline void EEPROM_Load(void)
 inline void System_Reset(void)
 {
 	Blaster.Fan_duty = Fan_duty_init;
-	Blaster.Face_index = Face_index_General;
-	Blaster.Face_startup_index = Face_index_General;
-	Blaster.Face_toggle_index = Face_index_General + 1;
+	Blaster.Face_index = 0;
+	Blaster.Face_startup_index = 0;
+	Blaster.Face_toggle_index = 1;
 	Blaster.Matrix_Brightness = Matrix_brightness_init;
 	Blaster.Blink_period = Blink_period_init;
 	Blaster.Boop = Boop_init;
@@ -233,9 +233,9 @@ inline void parameter_init(void)
 	Blaster.remote = 1;
 	Blaster.ADC_value = 0;
 	Blaster.Fan_duty = Fan_duty_init;
-	Blaster.Face_index = Face_index_General;
-	Blaster.Face_startup_index = Face_index_General;
-	Blaster.Face_toggle_index = Face_index_General + 1;
+	Blaster.Face_index = 0;
+	Blaster.Face_startup_index = 0;
+	Blaster.Face_toggle_index = 1;
 	Blaster.Matrix_Brightness = Matrix_brightness_init;
 	Blaster.Blink_period = Blink_period_init;
 	Blaster.Boop = Boop_init;
