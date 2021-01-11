@@ -1,13 +1,13 @@
 ##Face xlsx to header file convertor
 import os
-import shutil
 from datetime import datetime
 from openpyxl import load_workbook
 from shutil import copyfile
+from shutil import rmtree
 from PIL import Image
 from PIL import ImageDraw
 
-file_list = open('../Protogen_list.txt', 'r')
+file_list = open('../output/Protogen_list.txt', 'r')
 protogen_list = file_list.readlines()
 file_list.close()
 print('Choose Protogen：')
@@ -37,7 +37,7 @@ file_face = open('../output/Face.h', 'w')
 time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 file_face.write('//' + time + '\t\t' + protogen_ID + '_' + protogen_name + '\n\n')
 
-wb = load_workbook(filename = '../LED Matrix.xlsx', data_only = True, read_only = True)
+wb = load_workbook(filename = '../Configure/{}LED_Matrix.xlsx'.format(protogen_path), data_only = True, read_only = True)
 sheet_num = len(wb.worksheets)
 
 for ws in range(11 ,sheet_num):
@@ -60,7 +60,7 @@ nose_array = []
 mouth_array = []
 
 if os.path.isdir('../../image/Jpg/' + protogen_path):
-    shutil.rmtree('../../image/Jpg/' + protogen_path)
+    rmtree('../../image/Jpg/' + protogen_path)
 os.mkdir('../../image/Jpg/' + protogen_path)
 
 for ws in range(11 ,sheet_num):    
@@ -302,7 +302,7 @@ file_image.write('};\n')
 
 file_image.close()
 
-
+##################################################################################################
 file_ID = open('../output/UUID.txt', 'r')
 UUID_content = file_ID.readlines()
 file_ID.close()
@@ -318,6 +318,12 @@ file_BLEID.writelines(UUID_content)
 file_BLEID.seek(0,2)
 file_BLEID.write('#endif\n')
 file_BLEID.close()
+##################################################################################################
+
+##################################################################################################
+
+
+##################################################################################################
 
 copyfile('../output/Face.h', '../../Protogen_matrixs/Header Files/Face.h')
 copyfile('../output/image.h', '../../ProtoGun/Header Files/image.h')

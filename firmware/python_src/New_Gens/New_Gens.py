@@ -1,6 +1,7 @@
 import os
 import uuid
-import shutil
+from shutil import rmtree
+from shutil import copy
 from PIL import ImageDraw
 
 for_testing = False
@@ -19,13 +20,26 @@ def color_threshold(color_in):
     else:
         return '255'
 
+def remove_and_shift_folder(root_path, protogen_serial_to_del):
+    folder_list = os.listdir(root_path)
+
+    for k in range(len(folder_list)):
+        if folder_list[k].split('. ')[0].isnumeric():
+            folder_serial = (int)(folder_list[k].split('. ')[0])
+            if folder_serial == protogen_serial_to_del:
+                rmtree(root_path + folder_list[k])
+            elif folder_serial > protogen_serial_to_del:
+                os.rename(root_path + folder_list[k], root_path + '{:0>2d}{}'.format(folder_serial - 1, folder_list[k][2:]))
+        else:
+            break
+
 def do_rename(protogen, new_name):
     #rename jpg folder
     #modify protogen_list
     try:
         protogen_number = protogen.split('.')[0]
-        list = open('../Protogen_list.txt', 'r')
-        list_new = open('../Protogen_list_bak.txt', 'w')
+        list = open('../output/Protogen_list.txt', 'r')
+        list_new = open('../output/Protogen_list_bak.txt', 'w')
         for i in list:
             if i.split('.')[0] == protogen_number:
                 i = i.replace(i.split('\t', 2)[0], protogen_number + '. ' + new_name)
@@ -36,12 +50,15 @@ def do_rename(protogen, new_name):
         list.close()
 
         test_pause()
-        os.remove('../Protogen_list.txt')
-        os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
+        os.remove('../output/Protogen_list.txt')
+        os.rename('../output/Protogen_list_bak.txt', '../output/Protogen_list.txt')
 
         if os.path.isdir('../../image/Jpg/' + protogen):
-            shutil.rmtree('../../image/Jpg/' + protogen)
+            rmtree('../../image/Jpg/' + protogen)
             os.mkdir('../../image/Jpg/' + protogen_number + '. ' + new_name)
+
+        if os.path.isdir('../Configure/' + protogen):
+            os.rename('../Configure/' + protogen, '../Configure/' + protogen_number + '. ' + new_name)
 
         return True
     except:
@@ -52,8 +69,8 @@ def do_recolor(protogen, R, G, B):
     #modify protogen_list
     try:
         protogen_number = protogen.split('.')[0]
-        list = open('../Protogen_list.txt', 'r')
-        list_new = open('../Protogen_list_bak.txt', 'w')
+        list = open('../output/Protogen_list.txt', 'r')
+        list_new = open('../output/Protogen_list_bak.txt', 'w')
         for i in list:
             if i.split('.')[0] == protogen_number:
                 i = i.replace(i.split('\t', 2)[1], '(' + R + ',' + G + ',' + B + ')')
@@ -64,11 +81,11 @@ def do_recolor(protogen, R, G, B):
         list.close()
 
         test_pause()
-        os.remove('../Protogen_list.txt')
-        os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
+        os.remove('../output/Protogen_list.txt')
+        os.rename('../output/Protogen_list_bak.txt', '../output/Protogen_list.txt')
 
         if os.path.isdir('../../image/Jpg/' + protogen):
-            shutil.rmtree('../../image/Jpg/' + protogen)
+            rmtree('../../image/Jpg/' + protogen)
             os.mkdir('../../image/Jpg/' + protogen)
 
         return True
@@ -80,8 +97,8 @@ def do_retheme(protogen, theme):
     #modify protogen_list
     try:
         protogen_number = protogen.split('.')[0]
-        list = open('../Protogen_list.txt', 'r')
-        list_new = open('../Protogen_list_bak.txt', 'w')
+        list = open('../output/Protogen_list.txt', 'r')
+        list_new = open('../output/Protogen_list_bak.txt', 'w')
         for i in list:
             if i.split('.')[0] == protogen_number:
                 i = i.replace(i.split('\t', 2)[2], theme + '\n')
@@ -92,13 +109,13 @@ def do_retheme(protogen, theme):
         list.close()
 
         test_pause()
-        os.remove('../Protogen_list.txt')
-        os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
+        os.remove('../output/Protogen_list.txt')
+        os.rename('../output/Protogen_list_bak.txt', '../output/Protogen_list.txt')
 
         if os.path.isdir('../../image/Jpg/' + protogen):
-            shutil.rmtree('../../image/Jpg/' + protogen)
+            rmtree('../../image/Jpg/' + protogen)
             os.mkdir('../../image/Jpg/' + protogen)
-
+        
         return True
     except:
         return False
@@ -108,24 +125,18 @@ def do_delete(protogen):
     #modify protogen_list   (shift protogen number)
     #modify UUID file   (shift protogen number)
     try:
-        file_list = open('../Protogen_list.txt', 'r')
+        file_list = open('../output/Protogen_list.txt', 'r')
         protogen_num = len(file_list.readlines())
         file_list.close()
         protogen_serial_to_del = (int)(protogen.split('.')[0])
-        
-        folder_list = os.listdir('../../image/Jpg')
 
-        for k in range(len(folder_list)):
-            folder_serial = (int)(folder_list[k].split('. ')[0])
-            if folder_serial == protogen_serial_to_del:
-                shutil.rmtree('../../image/Jpg/' + folder_list[k])
-            elif folder_serial > protogen_serial_to_del:
-                os.rename('../../image/Jpg/' + folder_list[k], '../../image/Jpg/{:0>2d}{}'.format(folder_serial - 1, folder_list[k][2:]))
+        remove_and_shift_folder('../../image/Jpg/', protogen_serial_to_del)
+        remove_and_shift_folder('../Configure/', protogen_serial_to_del)
 
-        list_f = open('../Protogen_list.txt', 'r')
+        list_f = open('../output/Protogen_list.txt', 'r')
         list = list_f.readlines()
         list_f.close()
-        list_new = open('../Protogen_list_bak.txt', 'w')
+        list_new = open('../output/Protogen_list_bak.txt', 'w')
         UUID_f = open('../output/UUID.txt', 'r')
         UUID = UUID_f.readlines()
         UUID_f.close()
@@ -149,8 +160,8 @@ def do_delete(protogen):
         
         test_pause()
         
-        os.remove('../Protogen_list.txt')
-        os.rename('../Protogen_list_bak.txt', '../Protogen_list.txt')
+        os.remove('../output/Protogen_list.txt')
+        os.rename('../output/Protogen_list_bak.txt', '../output/Protogen_list.txt')
         os.remove('../output/UUID.txt')
         os.rename('../output/UUID_bak.txt', '../output/UUID.txt')
         
@@ -164,6 +175,15 @@ print('Hellowo!!')
 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 while(True):
     protogen_name = input('please enter New Protogen name or enter -E to edit Protogens：')
+
+    space_num = 0
+    for i in range(len(protogen_name)):
+        if protogen_name[i].isspace():
+            space_num += 1
+    if space_num == len(protogen_name):
+        print('No empty name allowed')
+        os.system('pause')
+        os._exit(0)
 
     if protogen_name != '-E' and protogen_name != '-e':
         color_R = input('please enter faceture color R：')
@@ -187,17 +207,21 @@ while(True):
             remote_theme_path = 0
         remote_theme_path = remote_theme_list[(int)(remote_theme_path)]
 
-        file_list = open('../Protogen_list.txt', 'r')
+        file_list = open('../output/Protogen_list.txt', 'r')
         protogen_ID = len(file_list.readlines())
         file_list.close()
         protogen = '{:0>2d}'.format(protogen_ID) + '. ' + protogen_name
 
-        file_list = open('../Protogen_list.txt', 'a')
+        file_list = open('../output/Protogen_list.txt', 'a')
         file_list.write(protogen + '\t(' + color_R + ',' + color_G + ',' + color_B + ')\t' + remote_theme_path +'\n')
         file_list.close()
 
         if not os.path.isdir('../../image/Jpg/' + protogen):
             os.mkdir('../../image/Jpg/' + protogen)
+
+        if not os.path.isdir('../Configure/' + protogen):
+            os.mkdir('../Configure/' + protogen)
+            copy('../Configure/Template/LED_Matrix.xlsx', '../Configure/{}/LED_Matrix.xlsx'.format(protogen))
 
         if not os.path.isdir('../output'):
             os.mkdir('../output')
@@ -213,7 +237,7 @@ while(True):
     else:
         while(True):
             if cmd == '-i' or cmd == '-I':
-                file_list = open('../Protogen_list.txt', 'r')
+                file_list = open('../output/Protogen_list.txt', 'r')
                 protogen_list = file_list.readlines()
                 file_list.close()
                 print('Choose Protogen：')

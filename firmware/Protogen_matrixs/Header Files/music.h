@@ -1,6 +1,5 @@
-// note,  octave,  note_time,  if joined note
-#define newmusic_test
-#ifndef newmusic_test
+//pitch,  octave,  beat,  if joined note
+/*
 uint8_t megalovania[][4] =
 {
 	{0, 4, 32, 0}, //start
@@ -28,8 +27,7 @@ uint16_t megalovania_note_time[6] =
 	(60000 / megalovania_tempo / 4) - beep_time,  //16th
 	(60000 / megalovania_tempo / 8) - beep_time   //32th
 };
-
-#else
+*/
 void * struct_init_dummy;
 
 _sheet megalovania_sheet[13] = 
@@ -68,5 +66,3 @@ _music * music_ptr_rack[] =
 {
 	(_music *)(&megalovania),		//0x1
 };
-
-#endif

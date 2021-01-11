@@ -617,7 +617,7 @@ void BZ_task(void * parameter)
 				break;
 				
 			case BZ_mode_music:
-				#ifndef newmusic_test
+				/*
 				for (i = 1; i < megalovania_length; i++)
 				{
 					if (!megalovania[i - 1][3])  //if not last note joined note
@@ -640,7 +640,7 @@ void BZ_task(void * parameter)
 					}
 					vTaskDelay(megalovania_note_time[j] / portTICK_PERIOD_MS);
 				}
-				#else // note,  octave,  note_time,  if joined note
+				*/
 				if(*(Face_current.piece))
 				{
 					play_now = music_ptr_rack[*(Face_current.piece) - 1];
@@ -649,7 +649,7 @@ void BZ_task(void * parameter)
 					{
 						if (!play_now->sheet[i - 1].joined)  //if last note not joined note
 						{
-							BZ_music(BZ_channel, play_now->sheet[i].note, play_now->sheet[i].octave);
+							BZ_music(BZ_channel, play_now->sheet[i].pitch, play_now->sheet[i].octave);
 						}
 						vTaskDelay(play_now->ring_time / portTICK_PERIOD_MS);
 						if (!play_now->sheet[i].joined)  //if not joined note
@@ -659,7 +659,7 @@ void BZ_task(void * parameter)
 						j = 0;
 						while (j < 8)
 						{
-							if (play_now->sheet[i].beat >> j == 0x01)
+							if (play_now->sheet[i].note >> j == 0x01)
 							{
 								break;
 							}
@@ -670,7 +670,6 @@ void BZ_task(void * parameter)
 					Protogen.music_playing = 0;
 				}
 				BZ_mode(BZ_mode_OFF);
-				#endif
 				break;
 
 			case BZ_mode_save:
