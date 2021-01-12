@@ -50,7 +50,7 @@ file_face.write('_face * face_ptr_rack[] =\n{\n')
 
 for ws in range(start_sheet ,sheet_num):
     value = wb[wb.worksheets[ws].title]['E32'].value
-    file_face.write('\t(_face *)(&Face_' + value + '),\t\t//' + hex(ws - start_sheet) + '\n')
+    file_face.write('\t(_face *)(&Face_{}),\t\t//{}\n'.format(value, hex(ws - start_sheet)))
         
 file_face.write('\n};')
 file_face.close()
@@ -65,7 +65,7 @@ os.mkdir('../../image/Jpg/' + protogen_path)
 
 for ws in range(start_sheet ,sheet_num):    
     face_name = wb[wb.worksheets[ws].title]['E32'].value
-    save_path = '../../image/Jpg/' + protogen_path + '{:0>2d}_'.format(ws - 10) + face_name + '.png'
+    save_path = '../../image/Jpg/' + protogen_path + '{:0>2d}_'.format(ws - start_sheet) + face_name + '.png'
     eye_array = wb[wb.worksheets[ws].title]['X12'].value.split(',', 16)
     nose_array = wb[wb.worksheets[ws].title]['N10'].value.split(',', 8)
     mouth_array = wb[wb.worksheets[ws].title]['E30'].value.split(',', 32)
