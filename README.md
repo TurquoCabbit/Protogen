@@ -19,20 +19,17 @@
     * ### PROTOGEN_HEAD
         1. ### Faceture dittering
             * #### even during blinking
-        2. ### BZ Music
-            * #### driver code
-            * #### makefile (Face2header.exe)
-        3. ### Vocal sampling
+        2. ### Vocal sampling
             * #### use LM386 for mic amp
             * #### and to speaker      
-        4. ### Geather scirpt into fuction in Face2header.exe
+        3. ### Geather scirpt into objective fuction in Face2header.exe and rewrite string format
 
     * ### REMOTE
-        1. ### Offline operation
+        1. ### Offline operation (NEXT BIG URGEN!!!)
             1. #### saving
                 * ##### only save remote/blaster related feature
             2. #### reseting
                 * ##### only save remote/blaster related feature
-        2. ### Geather scirpt into fuction in New_gen.exe
+        2. ### Geather scirpt into objective fuction in New_gen.exe and rewrite string format
 
 #####  Turquo   2021/01/06
