@@ -30,6 +30,7 @@
                 * ##### only save remote/blaster related feature
             2. #### reseting
                 * ##### only save remote/blaster related feature
-        2. ### Geather scirpt into objective fuction in New_gen.exe and rewrite string format
+        2. ### Translate remote user guide
+        3. ### Geather scirpt into objective fuction in New_gen.exe and rewrite string format
 
 #####  Turquo   2021/01/06
