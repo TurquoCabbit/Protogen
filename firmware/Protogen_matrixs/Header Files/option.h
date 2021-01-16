@@ -31,7 +31,7 @@
 #define BLE_reconnect_time		6000	//in 10ms
 
 //Sreial
-#define do_serial 1
+#define do_serial 0
 #if do_serial
     #define serial_log(header, data) {Serial.print(header);Serial.print(" -> ");Serial.println(data);}
 #else
