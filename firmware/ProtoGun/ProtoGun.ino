@@ -391,21 +391,7 @@ void GUI_task(void * parameter)
 					LCD_refresh_cnt.Face_resume = 0;
 				}
 				
-				//Set face				Enter
-				if (Get_But(&But_Enter))
-				{
-					serial_log(0, "Set face");
-					VM_mode(VM_mode_on_long);
-					Blaster.Face_index = Face_show_index;
-					if (toggled)
-					{
-						toggled = 0;
-					}
-					ProtoGun_setCMD(Face_cmd[Blaster.Face_index]);
-					LCD_refresh_cnt.Face_resume = Face_resume_time + 1;
-					BLE_mode(BLE_mode_notify);
-				}
-				//resume face
+				//resume face after 10s
 				if (LCD_refresh_cnt.Face_resume == Face_resume_time && Face_show_index != Blaster.Face_index)
 				{
 					serial_log(0, "resume face");
@@ -415,66 +401,94 @@ void GUI_task(void * parameter)
 					LCD_refresh_cnt.main = 1;
 				}
 
+				//Set face				Enter
+				if (Get_But(&But_Enter))
+				{
+					VM_mode(VM_mode_on_long);
+					if(ProtoGun_setCMD(Face_cmd[Blaster.Face_index]))
+					{
+						serial_log(0, "Set face");
+						Blaster.Face_index = Face_show_index;
+						if (toggled)
+						{
+							toggled = 0;
+						}
+						
+						LCD_refresh_cnt.Face_resume = Face_resume_time + 1;
+						BLE_mode(BLE_mode_notify);
+					}
+				}
+
 				//Fast toggle face		X
 				if (Get_But(&But_X))
 				{
-					serial_log(0, "Toggle face");
 					VM_mode(VM_mode_on_long);
-					if (!toggled)
+					if(ProtoGun_setCMD(Face_cmd[Blaster.Face_index]))
 					{
-						Face_toggle_temp = Blaster.Face_index;
-						Blaster.Face_index = Blaster.Face_toggle_index;
-						Face_show_index = Blaster.Face_toggle_index;
-						toggled = 1;
+						serial_log(0, "Toggle face");
+						if (!toggled)
+						{
+							Face_toggle_temp = Blaster.Face_index;
+							Blaster.Face_index = Blaster.Face_toggle_index;
+							Face_show_index = Blaster.Face_toggle_index;
+							toggled = 1;
+						}
+						else
+						{
+							Face_show_index = Face_toggle_temp;
+							Blaster.Face_index = Face_toggle_temp;
+							toggled = 0;
+						}					
+						LCD_refresh_cnt.main = 1;
+						BLE_mode(BLE_mode_notify);
 					}
-					else
-					{
-						Face_show_index = Face_toggle_temp;
-						Blaster.Face_index = Face_toggle_temp;
-						toggled = 0;
-					}
-					ProtoGun_setCMD(Face_cmd[Blaster.Face_index]);
-					LCD_refresh_cnt.main = 1;
-					BLE_mode(BLE_mode_notify);
 				}
 
 				//Fast animate		Hold X 1sec
 				if (Get_But(&But_X, 1000))
 				{
-					serial_log(0, "Replay animate");
 					VM_mode(VM_mode_on_long);
-					ProtoGun_setCMD(0x1A0);    //Fast animate
-					BLE_mode(BLE_mode_notify);
+					if(ProtoGun_setCMD(0x1A0))    //Fast animate
+					{
+						serial_log(0, "Replay animate");
+						BLE_mode(BLE_mode_notify);
+					}
 				}
 
 				//Fast Beep		Y
 				if (Get_But(&But_Y))
 				{
-					serial_log(0, "Beep");
 					VM_mode(VM_mode_on_long);
-					ProtoGun_setCMD(0x000);    //Beep
-					BLE_mode(BLE_mode_notify);
+					if(ProtoGun_setCMD(0x000))    //Beep
+					{
+						serial_log(0, "Beep");
+						BLE_mode(BLE_mode_notify);
+					}
 				}
 
 				//Fast brightness		Return
 				if (Get_But(&But_Return))
 				{
 					serial_log(0, "Brightness");
+					VM_mode(VM_mode_on_long);
 					if (!Max_brightness)
 					{
-						VM_mode(VM_mode_on_long);
-						Max_brightness = 1;
-						ProtoGun_setCMD(0x10F);    //Matrix Brightness_15
-						BLE_mode(BLE_mode_notify);
+						if(ProtoGun_setCMD(0x10F))    //Matrix Brightness_15
+						{
+							Max_brightness = 1;							
+							BLE_mode(BLE_mode_notify);
+							LCD_refresh_cnt.info = 1;
+						}
 					}
 					else
 					{
-						VM_mode(VM_mode_on_long);
-						Max_brightness = 0;
-						ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness);
-						BLE_mode(BLE_mode_notify);
+						if(ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness))
+						{
+							Max_brightness = 0;
+							BLE_mode(BLE_mode_notify);
+							LCD_refresh_cnt.info = 1;
+						}
 					}
-					LCD_refresh_cnt.info = 1;
 				}
 
 				//Setting				Hold return 1sec
@@ -664,8 +678,6 @@ void GUI_task(void * parameter)
 				if (show)
 				{
 					show = 0;
-					ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness);    //Matrix Brightness
-					BLE_mode(BLE_mode_notify);
 					tft.fillScreen(TFT_BLACK);  // clean screen
 					LCD_show_title(Setting_list, setting_list_index);
 
@@ -683,7 +695,15 @@ void GUI_task(void * parameter)
 					if (Blaster.Matrix_Brightness > 0)
 					{
 						Blaster.Matrix_Brightness--;
-						show = 1;
+						if(ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness))    //Matrix Brightness
+						{
+							BLE_mode(BLE_mode_notify);
+							show = 1;
+						}
+						else
+						{
+							Blaster.Matrix_Brightness++;
+						}
 					}
 				}
 				else if (Encoder_up)
@@ -692,7 +712,15 @@ void GUI_task(void * parameter)
 					if (Blaster.Matrix_Brightness < 15)
 					{
 						Blaster.Matrix_Brightness++;
-						show = 1;
+						if(ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness))    //Matrix Brightness
+						{
+							BLE_mode(BLE_mode_notify);
+							show = 1;
+						}
+						else
+						{
+							Blaster.Matrix_Brightness--;
+						}
 					}
 				}
 
@@ -706,9 +734,11 @@ void GUI_task(void * parameter)
 				{
 					VM_mode(VM_mode_on_long);
 					show = 1;
-					ProtoGun_setCMD(0x100 + temp_16);
-					BLE_mode(BLE_mode_notify);
 					Blaster.Matrix_Brightness = temp_16;
+					if(ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness))    //Matrix Brightness
+					{
+						BLE_mode(BLE_mode_notify);
+					}
 					GUI_mode(GUI_mode_setting);
 				}
 				else
@@ -966,14 +996,18 @@ void GUI_task(void * parameter)
 				if (Encoder_down)
 				{
 					Encoder_down = 0;
-					ProtoGun_setCMD(0x021);    //Pitch down
-					BLE_mode(BLE_mode_notify);
+					if(ProtoGun_setCMD(0x021))    //Pitch down
+					{
+						BLE_mode(BLE_mode_notify);
+					}
 				}
 				else if (Encoder_up)
 				{
 					Encoder_up = 0;
-					ProtoGun_setCMD(0x020);    //Pitch up
-					BLE_mode(BLE_mode_notify);
+					if(ProtoGun_setCMD(0x020))    //Pitch up
+					{
+						BLE_mode(BLE_mode_notify);
+					}
 				}
 
 				if (Get_But(&But_Enter))
@@ -986,8 +1020,10 @@ void GUI_task(void * parameter)
 				{
 					VM_mode(VM_mode_on_long);
 					show = 1;
-					ProtoGun_setCMD(0x022);    //Reset pitch
-					BLE_mode(BLE_mode_notify);
+					if(ProtoGun_setCMD(0x022))    //Reset pitch
+					{
+						BLE_mode(BLE_mode_notify);
+					}
 					GUI_mode(GUI_mode_beep);
 				}
 				else
@@ -1057,8 +1093,6 @@ void GUI_task(void * parameter)
 				if (show)
 				{
 					show = 0;
-					ProtoGun_setCMD(0x300 + Blaster.Neo_Brightness);    //Matrix Brightness
-					BLE_mode(BLE_mode_notify);
 					tft.fillScreen(TFT_BLACK);  // clean screen
 					LCD_show_title(Setting_list, setting_list_index);
 
@@ -1076,7 +1110,16 @@ void GUI_task(void * parameter)
 					if (Blaster.Neo_Brightness > 0)
 					{
 						Blaster.Neo_Brightness--;
-						show = 1;
+						if(ProtoGun_setCMD(0x300 + Blaster.Neo_Brightness))    //Matrix Brightness
+						{
+							BLE_mode(BLE_mode_notify);
+							show = 1;
+						}
+						else
+						{
+							Blaster.Neo_Brightness++;
+						}
+						
 					}
 				}
 				else if (Encoder_up)
@@ -1085,7 +1128,15 @@ void GUI_task(void * parameter)
 					if (Blaster.Neo_Brightness < 0xFF)
 					{
 						Blaster.Neo_Brightness++;
-						show = 1;
+						if(ProtoGun_setCMD(0x300 + Blaster.Neo_Brightness))    //Matrix Brightness
+						{
+							BLE_mode(BLE_mode_notify);
+							show = 1;
+						}
+						else
+						{
+							Blaster.Neo_Brightness--;
+						}
 					}
 				}
 
@@ -1099,9 +1150,11 @@ void GUI_task(void * parameter)
 				{
 					VM_mode(VM_mode_on_long);
 					show = 1;
-					ProtoGun_setCMD(0x300 + temp_16);
-					BLE_mode(BLE_mode_notify);
 					Blaster.Neo_Brightness = temp_16;
+					if(ProtoGun_setCMD(0x300 + Blaster.Neo_Brightness))    //Matrix Brightness
+					{
+						BLE_mode(BLE_mode_notify);
+					}
 					GUI_mode(GUI_mode_setting);
 				}
 				else
@@ -1330,7 +1383,24 @@ void GUI_task(void * parameter)
 				
 				if (Get_But(&But_Y, 3000))
 				{
-					VM_mode(VM_mode_on_extra);
+					VM_mode(VM_mode_on_long_thrice);
+					if(ProtoGun_setCMD(0x1FF))    //Reset
+					{
+						BLE_mode(BLE_mode_notify);
+						System_Reset();
+					}
+					else
+					{
+						System_Reset_offline();
+					}
+					Battery_level_init();
+					show = 1;
+					setting_list_index = 0;
+					GUI_mode(GUI_mode_main);
+				}
+				else if(Get_But(&But_Y, 5000) && Get_But(&But_Enter, 5000))		//hard reset
+				{
+					VM_mode(VM_mode_on_extra_long);
 					ProtoGun_setCMD(0x1FF);    //Reset
 					BLE_mode(BLE_mode_notify);
 					System_Reset();
@@ -1361,18 +1431,29 @@ void GUI_task(void * parameter)
 				tft.printf("\n Saving");				
 
 				//first in last out
-				ProtoGun_setCMD(0x1F0);    //Svae
-				ProtoGun_setCMD(0x030 + Blaster.Beep_period);    //Period
-				ProtoGun_setCMD(0x010 + Blaster.Beep_mode);    //Mode
-				ProtoGun_setCMD(0x140 + (Blaster.Boop & 0x01));    //Boop
-				ProtoGun_setCMD(0x130 + Blaster.Blink_period);    //Blink_period
-				ProtoGun_setCMD(0x110 + (Blaster.Face_startup_index & 0x0F));    //Starup face_L
-				ProtoGun_setCMD(0x120 + ((Blaster.Face_startup_index >> 4) & 0x0F));    //Starup face_H
-				ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness);    //Matrix Brightness
-				ProtoGun_setCMD(0x300 + Blaster.Neo_Brightness);    //Neo_Brightness
-				BLE_mode(BLE_mode_notify);
+
+				if (ProtoGun_setCMD(0x1F0) &&												//Svae
+					ProtoGun_setCMD(0x030 + Blaster.Beep_period) &&							//Period
+					ProtoGun_setCMD(0x010 + Blaster.Beep_mode) &&							//Mode
+					ProtoGun_setCMD(0x140 + (Blaster.Boop & 0x01)) &&						//Boop
+					ProtoGun_setCMD(0x130 + Blaster.Blink_period) &&						//Blink_period
+					ProtoGun_setCMD(0x110 + (Blaster.Face_startup_index & 0x0F)) &&			//Starup face_L
+					ProtoGun_setCMD(0x120 + ((Blaster.Face_startup_index >> 4) & 0x0F)) &&	//Starup face_H
+					ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness) &&					//Matrix Brightness
+					ProtoGun_setCMD(0x300 + Blaster.Neo_Brightness))						//Neo_Brightness
+				{
+					tft.printf("\n Saving");
+					BLE_mode(BLE_mode_notify);
+					EEPROM_Save();
+				}
+				else
+				{
+					tft.printf("\n Offline");
+					tft.printf("\n Saving");
+					EEPROM_Save_offline();
+				}
+				
 				Battery_level_init();
-				EEPROM_Save();
 				show = 1;
 				setting_list_index = 0;
 				vTaskDelay(500 / portTICK_PERIOD_MS);
@@ -1582,17 +1663,49 @@ void VM_task(void * parameter)
 				digitalWrite(V_motor_PIN, 0);
 				vTaskDelete(NULL);
 				break;
-			case VM_mode_on_long:
+			case VM_mode_on_short_thrice:
 				digitalWrite(V_motor_PIN, 1);
-				vTaskDelay(V_motor_duration_long / portTICK_PERIOD_MS);
+				vTaskDelay(V_motor_duration_short / portTICK_PERIOD_MS);
 				digitalWrite(V_motor_PIN, 0);
-				break;
+				vTaskDelay(V_motor_duration_short / portTICK_PERIOD_MS);
+			case VM_mode_on_short_twice:
+				digitalWrite(V_motor_PIN, 1);
+				vTaskDelay(V_motor_duration_short / portTICK_PERIOD_MS);
+				digitalWrite(V_motor_PIN, 0);
+				vTaskDelay(V_motor_duration_short / portTICK_PERIOD_MS);
 			case VM_mode_on_short:
 				digitalWrite(V_motor_PIN, 1);
 				vTaskDelay(V_motor_duration_short / portTICK_PERIOD_MS);
 				digitalWrite(V_motor_PIN, 0);
 				break;
-			case VM_mode_on_extra:
+
+			case VM_mode_on_long_thrice:
+				digitalWrite(V_motor_PIN, 1);
+				vTaskDelay(V_motor_duration_long / portTICK_PERIOD_MS);
+				digitalWrite(V_motor_PIN, 0);
+				vTaskDelay(V_motor_duration_long / portTICK_PERIOD_MS);
+			case VM_mode_on_long_twice:
+				digitalWrite(V_motor_PIN, 1);
+				vTaskDelay(V_motor_duration_long / portTICK_PERIOD_MS);
+				digitalWrite(V_motor_PIN, 0);
+				vTaskDelay(V_motor_duration_long / portTICK_PERIOD_MS);
+			case VM_mode_on_long:
+				digitalWrite(V_motor_PIN, 1);
+				vTaskDelay(V_motor_duration_long / portTICK_PERIOD_MS);
+				digitalWrite(V_motor_PIN, 0);
+				break;
+
+			case VM_mode_on_extra_long_thrice:
+				digitalWrite(V_motor_PIN, 1);
+				vTaskDelay(V_motor_duration_extra / portTICK_PERIOD_MS);
+				digitalWrite(V_motor_PIN, 0);
+				vTaskDelay(V_motor_duration_extra / portTICK_PERIOD_MS);
+			case VM_mode_on_extra_long_twice:
+				digitalWrite(V_motor_PIN, 1);
+				vTaskDelay(V_motor_duration_extra / portTICK_PERIOD_MS);
+				digitalWrite(V_motor_PIN, 0);
+				vTaskDelay(V_motor_duration_extra / portTICK_PERIOD_MS);
+			case VM_mode_on_extra_long:
 				digitalWrite(V_motor_PIN, 1);
 				vTaskDelay(V_motor_duration_extra / portTICK_PERIOD_MS);
 				digitalWrite(V_motor_PIN, 0);
