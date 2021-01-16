@@ -11,16 +11,12 @@ class MyServerCallback : public BLEServerCallbacks {
 	void onConnect(BLEServer* pServer) {
 		BLE_connected = true;
 		BLE_buffer_index = -1;
-		#if do_serial
-		Serial.println("onConnect");
-		#endif
+		serial_log(0, "onConnect");
 	}
 
 	void onDisconnect(BLEServer* pServer) {
 		BLE_connected = false;
-		#if do_serial
-		Serial.println("onDisconnect");
-		#endif
+		serial_log(0, "onDisconnect");
 	}
 };
 

@@ -72,17 +72,11 @@ uint32_t LCD_sleep_cnt = 0;
 
 inline void LCD_init(void)
 {
-	#if do_serial
-	Serial.println("LCD_init_START");
-	#endif
-
+	serial_log(0, "LCD_init_START");
 	tft.begin();               // init LCD
 	tft.fillScreen(TFT_BLACK);  // clean screen
 	tft.setSwapBytes(true);
-
-	#if do_serial
-	Serial.println("LCD_init_DONE");
-	#endif
+	serial_log(0, "LCD_init_DONE");
 }
 
 void LCD_show_Battery(const uint16_t *pic)

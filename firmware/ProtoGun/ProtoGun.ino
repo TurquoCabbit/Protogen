@@ -19,9 +19,7 @@
 void setup()
 {
 	Serial.begin(115200);
-	#if do_serial
-	Serial.println("start up");
-	#endif
+	serial_log(0, "start up");
 	gpio_init();
 
 	parameter_init();
@@ -89,33 +87,25 @@ void setup()
 		&VM_task_handle,  /* Task handle. */
 		core_0);
 
-	#if do_serial
-	Serial.println("create task done");
-	#endif
+	serial_log(0, "create task done");
 
 	if (digitalRead(Deter_PIN)) //remote
 	{
 		Blaster.Fan_ready = 0;
 		Blaster.remote = 1;
-		#if do_serial
-		Serial.println("remote");
-		#endif
+		serial_log(0, "remote");
 	}
 	else //Gun
 	{
 		Blaster.Fan_ready = 1;
 		Blaster.remote = 0;
-		#if do_serial
-		Serial.println("GUN");
-		#endif
+		serial_log(0, "GUN");
 	}
 
 	if (EEPROM.read(EEPROM_Addr_Saved) == EEPROM_saved)
 	{
 		EEPROM_Load();
-		#if do_serial
-		Serial.println("Load EEPROM done");
-		#endif
+		serial_log(0, "Load EEPROM done");
 	}
 
 	ADC_mode(ADC_mode_boost);
@@ -159,17 +149,13 @@ void Fan_task(void * parameter)
 						{
 							Blaster.Fan_duty = 50;
 						}
-						#if do_serial
-						Serial.println("Fan on");
-						#endif
+						serial_log(0, "Fan on");
 						Fan_status = 1;
 						Set_pwm(Blaster.Fan_duty, Fan_channel);
 					}
 					else if(!Get_But_press(&But_Trigger) && Fan_status)
 					{
-						#if do_serial
-						Serial.println("Fan off");
-						#endif
+						serial_log(0, "Fan off");
 						Fan_status = 0;
 						Set_pwm(50, Fan_channel);
 					}
@@ -216,11 +202,9 @@ void ADC_task(void * parameter)
 				}
 				else
 				{
-					#if do_serial
-					Serial.println("BATT LOW");
-					Serial.println(ADC_average);
-					Serial.println(Battery_level.Break);
-					#endif
+					serial_log(0, "BATT LOW");
+					serial_log(0, ADC_average);
+					serial_log(0, Battery_level.Break);
 					vTaskDelay(100 / portTICK_PERIOD_MS);
 					ADC_mode(ADC_mode_boost);
 				}
@@ -410,9 +394,7 @@ void GUI_task(void * parameter)
 				//Set face				Enter
 				if (Get_But(&But_Enter))
 				{
-					#if do_serial
-					Serial.println("Set face");
-					#endif
+					serial_log(0, "Set face");
 					VM_mode(VM_mode_on_long);
 					Blaster.Face_index = Face_show_index;
 					if (toggled)
@@ -426,9 +408,7 @@ void GUI_task(void * parameter)
 				//resume face
 				if (LCD_refresh_cnt.Face_resume == Face_resume_time && Face_show_index != Blaster.Face_index)
 				{
-					#if do_serial
-					Serial.println("resume face");
-					#endif
+					serial_log(0, "resume face");
 					VM_mode(VM_mode_on_long);
 					LCD_refresh_cnt.Face_resume = Face_resume_time + 1;
 					Face_show_index = Blaster.Face_index;
@@ -438,9 +418,7 @@ void GUI_task(void * parameter)
 				//Fast toggle face		X
 				if (Get_But(&But_X))
 				{
-					#if do_serial
-					Serial.println("Toggle face");
-					#endif
+					serial_log(0, "Toggle face");
 					VM_mode(VM_mode_on_long);
 					if (!toggled)
 					{
@@ -463,9 +441,7 @@ void GUI_task(void * parameter)
 				//Fast animate		Hold X 1sec
 				if (Get_But(&But_X, 1000))
 				{
-					#if do_serial
-					Serial.println("Replay animate");
-					#endif
+					serial_log(0, "Replay animate");
 					VM_mode(VM_mode_on_long);
 					ProtoGun_setCMD(0x1A0);    //Fast animate
 					BLE_mode(BLE_mode_notify);
@@ -474,9 +450,7 @@ void GUI_task(void * parameter)
 				//Fast Beep		Y
 				if (Get_But(&But_Y))
 				{
-					#if do_serial
-					Serial.println("Beep");
-					#endif
+					serial_log(0, "Beep");
 					VM_mode(VM_mode_on_long);
 					ProtoGun_setCMD(0x000);    //Beep
 					BLE_mode(BLE_mode_notify);
@@ -485,9 +459,7 @@ void GUI_task(void * parameter)
 				//Fast brightness		Return
 				if (Get_But(&But_Return))
 				{
-					#if do_serial
-					Serial.println("Brightness");
-					#endif
+					serial_log(0, "Brightness");
 					if (!Max_brightness)
 					{
 						VM_mode(VM_mode_on_long);
@@ -508,9 +480,7 @@ void GUI_task(void * parameter)
 				//Setting				Hold return 1sec
 				if (Get_But(&But_Return, 1000))
 				{
-					#if do_serial
-					Serial.println("Setting");
-					#endif
+					serial_log(0, "Setting");
 					VM_mode(VM_mode_on_long);
 					show = 1;
 					setting_list_index = 0;
@@ -520,9 +490,7 @@ void GUI_task(void * parameter)
 				//Signature				Hold Y 1sec
 				else if (Get_But(&But_Y, 1000))
 				{
-					#if do_serial
-					Serial.println("Signature");
-					#endif
+					serial_log(0, "Signature");
 					VM_mode(VM_mode_on_long);
 					temp_16 = GUI_temp16_init;
 					show = 1;
@@ -1509,16 +1477,12 @@ void Ctrl_task(void * parameter)
 					if (pos_now != digitalRead(Roll_B_PIN))
 					{
 						Encoder_down = 1;
-						#if do_serial
-						Serial.println("Encoder DOWN");
-						#endif
+						serial_log(0, "Encoder DOWN");
 					}
 					else
 					{
 						Encoder_up = 1;
-						#if do_serial
-						Serial.println("Encoder UP");
-						#endif
+						serial_log(0, "Encoder UP");
 					}
 				}
 				pos_old = pos_now;
@@ -1587,10 +1551,7 @@ void BLE_task(void * parameter)
 			case BLE_mode_notify:
 				if (BLE_connected && BLE_buffer_index > -1)
 				{
-					#if do_serial
-					Serial.print("BLE cmd : ");
-					Serial.println(BLE_value[BLE_buffer_index], HEX);
-					#endif
+					serial_log("BLE cmd", BLE_value[BLE_buffer_index]);
 					pCharacteristic->setValue(BLE_value[BLE_buffer_index]);
 					pCharacteristic->notify();
 					BLE_buffer_index--;

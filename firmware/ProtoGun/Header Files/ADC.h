@@ -22,14 +22,10 @@ _Battery_level Battery_level;
 
 inline void ADC_init(void)
 {
-	#if do_serial
-	Serial.println("ADC_init_START");
-	#endif
+	serial_log(0, "ADC_init_START");
 	adc1_config_width(ADC_WIDTH_BIT_12);
 	adc1_config_channel_atten(ADC1_CHANNEL_4, ADC_ATTEN_DB_0);  //full-scale voltage is 1.1V
-	#if do_serial
-	Serial.println("ADC_init_DONE");
-	#endif
+	serial_log(0, "ADC_init_DONE");
 }
 
 uint32_t ADC_convert(void)

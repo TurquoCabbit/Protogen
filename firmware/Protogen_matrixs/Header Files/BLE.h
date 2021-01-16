@@ -30,72 +30,50 @@ class MyClientCallback : public BLEClientCallbacks {
 	void onConnect(BLEClient* pclient) {
 		connected = true;
 		BLE_buffer_index = -1;
-		#if do_serial
-		Serial.println("onConnect");
-		#endif
+		serial_log(00, "onConnect");
 	}
 
 	void onDisconnect(BLEClient* pclient) {
 		connected = false;
-		#if do_serial
-		Serial.println("onDisconnect");
-		#endif
+		serial_log(00, "onDisconnect");
 	}
 };
 
 bool connectToServer() {
-	#if do_serial
-	Serial.print("Forming a connection to ");
-	Serial.println(myDevice->getAddress().toString().c_str());
-	#endif
+	serial_log("Forming a connection", myDevice->getAddress().toString().c_str());
 
 	BLEClient*  pClient = BLEDevice::createClient();
-	#if do_serial
-	Serial.println(" - Created client");
-	#endif
+	serial_log(00, " - Created client");
 
 	pClient->setClientCallbacks(new MyClientCallback());
 
 	// Connect to the remove BLE Server.
 	pClient->connect(myDevice);  // if you pass BLEAdvertisedDevice instead of address, it will be recognized type of peer device address (public or private)
-	#if do_serial
-	Serial.println(" - Connected to server");
-	#endif
+	serial_log(00, " - Connected to server");
 
 	// Obtain a reference to the service we are after in the remote BLE server.
 	BLERemoteService* pRemoteService = pClient->getService(serviceUUID);
 	if (pRemoteService == nullptr) {
-		#if do_serial
-		Serial.print("Failed to find our service UUID: ");
-		Serial.println(serviceUUID.toString().c_str());
-		#endif
+		serial_log("Failed to find our service UUID", serviceUUID.toString().c_str());
 		pClient->disconnect();
 		return false;
 	}
-	#if do_serial
-	Serial.println(" - Found our service");
-	#endif
+	serial_log(00, " - Found our service");
 
 
 	// Obtain a reference to the characteristic in the service of the remote BLE server.
 	pRemoteCharacteristic = pRemoteService->getCharacteristic(charUUID);
 	if (pRemoteCharacteristic == nullptr) {
-		#if do_serial
-		Serial.print("Failed to find our characteristic UUID: ");
-		Serial.println(charUUID.toString().c_str());
-		#endif
+		serial_log("Failed to find our characteristic UUID", charUUID.toString().c_str());
 		pClient->disconnect();
 		return false;
 	}
-	Serial.println(" - Found our characteristic");
+	serial_log(00, " - Found our characteristic");
 
 	// Read the value of the characteristic.
 	if (pRemoteCharacteristic->canRead()) {
 		uint16_t value = pRemoteCharacteristic->readUInt16();
-		#if do_serial
-		Serial.print("The characteristic value was: ");
-		Serial.println(value);
-		#endif
+		serial_log("The characteristic value was", value);
 	}
 
 	if (pRemoteCharacteristic->canNotify())
@@ -112,10 +90,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 	  * Called for each advertising BLE server.
 	  */
 	void onResult(BLEAdvertisedDevice advertisedDevice) {
-		#if do_serial
-		Serial.print("BLE Advertised Device found: ");
-		Serial.println(advertisedDevice.toString().c_str());
-		#endif
+		serial_log("BLE Advertised Device found", advertisedDevice.toString().c_str());
 
 		// We have found a device, let us now see if it contains the service we are looking for.
 		if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(serviceUUID)) {
@@ -133,9 +108,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 
 void BLE_init(void)
 {
-	#if do_serial
-	Serial.println("Starting Arduino BLE Client application...");
-	#endif
+	serial_log(00, "Starting Arduino BLE Client application...");
 	BLEDevice::init("");
 
 	// Retrieve a Scanner and set the callback we want to use to be informed when we
@@ -152,15 +125,11 @@ void BLE_init(void)
 	{
 		if (connectToServer())
 		{
-			#if do_serial
-			Serial.println("We are now connected to the Server");
-			#endif
+			serial_log(00, "We are now connected to the Server");
 		}
 		else
 		{
-			#if do_serial
-			Serial.println("Failed to connect to the server");
-			#endif
+			serial_log(00, "Failed to connect to the server");
 		}
 		doConnect = false;
 	}

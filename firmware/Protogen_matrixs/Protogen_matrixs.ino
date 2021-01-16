@@ -19,9 +19,7 @@
 void setup()
 {
 	Serial.begin(115200);
-	#if do_serial
-	Serial.println("start up");
-	#endif
+	serial_log(00, "start up");
 	gpio_init();
 
 	parameter_init();
@@ -116,16 +114,12 @@ void setup()
 		&BLE_task_handle,  /* Task handle. */
 		core_0);
 
-	#if do_serial
-	Serial.println("create task done");
-	#endif
+	serial_log(00, "create task done");
 	
 	if (EEPROM.read(EEPROM_Addr_Saved) == EEPROM_saved)
 	{
 		EEPROM_Load();
-		#if do_serial
-		Serial.println("Load EEPROM done");
-		#endif
+		serial_log(00, "Load EEPROM done");
 	}
 
 	BLE_mode(BLE_mode_boost);
@@ -151,9 +145,7 @@ void Neopixel_task(void * parameter)
 			case Neopixel_mode_boost:
 				ws2812driver.init(neo_ring);
 				neo_ring->setCustomShow([]() {ws2812driver.customShow(); });
-				#if do_serial
-				Serial.println("Neopixel_mode_boost");
-				#endif
+				serial_log(00, "Neopixel_mode_boost");
 				vTaskDelay(1 / portTICK_PERIOD_MS);
 				Neopixel_mode(Neopixel_mode_set);
 				break;
@@ -207,9 +199,7 @@ void Matrix_task(void * parameter)
 				clear_face_buffer(index_eye);
 				clear_face_buffer(index_nose);
 				clear_face_buffer(index_mouth);
-				#if do_serial
-				Serial.println("Matrix_mode_boost");
-				#endif
+				serial_log(00, "Matrix_mode_boost");
 				vTaskDelay(1 / portTICK_PERIOD_MS);
 				Matrix_mode(Matrix_mode_scan + *Face_index.animate_mode);
 				break;
@@ -553,9 +543,7 @@ void BZ_task(void * parameter)
 			{
 			case BZ_mode_boost:
 				ledcAttachPin(BZ_PIN, BZ_channel);
-				#if do_serial
-				Serial.println("BZ_mode_boost");
-				#endif
+				serial_log(00, "BZ_mode_boost");
 				break;
 
 			case BZ_mode_OFF:
@@ -728,9 +716,7 @@ void Ctrl_task(void * parameter)
 				Matrix_mode(Matrix_mode_boost);
 				BZ_mode(BZ_mode_boost);
 				Fan_mode(Fan_mode_on);
-				#if do_serial
-				Serial.println("Ctrl_mode_boost");
-				#endif
+				serial_log(00, "Ctrl_mode_boost");
 				vTaskDelay(5 / portTICK_PERIOD_MS);
 				Ctrl_mode(Ctrl_mode_general);
 				break;
@@ -840,9 +826,7 @@ void BLE_task(void * parameter)
 			{
 			case BLE_mode_boost:
 				BLE_init();
-				#if do_serial
-				Serial.println("BLE_mode_boost");
-				#endif
+				serial_log(00, "BLE_mode_boost");
 				Ctrl_mode(Ctrl_mode_boost);
 				break;
 
@@ -856,10 +840,7 @@ void BLE_task(void * parameter)
 			case BLE_mode_notify:
 				if (BLE_buffer_index > -1 && (BLE_cmd[BLE_buffer_index] & 0xF000) == (ProtoGen_ID << 12))
 				{
-					#if do_serial
-					Serial.print("BLE cmd : ");
-					Serial.println(BLE_cmd[BLE_buffer_index], HEX);
-					#endif
+					serial_log("BLE cmd", BLE_cmd[BLE_buffer_index]);
 					switch (BLE_cmd[BLE_buffer_index] & 0xF00)
 					{
 					case CMD_Bz:	//BZ
@@ -904,12 +885,8 @@ void BLE_task(void * parameter)
 							{
 								Protogen.Beep_pitch = Beep_pitch_init;
 							}
-							#if do_serial
-							Serial.print("Beep note : ");
-							Serial.print(Protogen.Beep_pitch & 0x0F);
-							Serial.print(", Octave : ");
-							Serial.println((Protogen.Beep_pitch >> 4) & 0xFF);
-							#endif
+							serial_log("Beep note", Protogen.Beep_pitch & 0x0F);
+							serial_log("Beep Octave", (Protogen.Beep_pitch >> 4) & 0xFF);
 							BZ_mode(BZ_mode_pitch_set);
 							break;
 						case 0x30:	//period
