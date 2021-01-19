@@ -21,16 +21,23 @@
             * #### even during blinking
         2. ### Vocal sampling
             * #### use LM386 for mic amp
-            * #### and to speaker      
-        3. ### Geather scirpt into objective fuction in Face2header.exe and rewrite string format
+            * #### and to speaker
+        3. ### Optimize cpp code structure
 
     * ### REMOTE
         1. ### Offline operation (NEXT BIG URGEN!!!)
+            0. #### <font color="17E6B2">DONE, Need test!</font>
             1. #### saving
                 * ##### only save remote/blaster related feature
             2. #### reseting
                 * ##### only save remote/blaster related feature
-        2. ### Translate remote user guide
-        3. ### Geather scirpt into objective fuction in New_gen.exe and rewrite string format
+        2. ### Add new ADC chennal (GPIO39)
+            1. #### Modify SCH and PCB
+                * ##### Add another set of dividr (15K/1K) 
+            2. #### Modify ProtoGun code
+                * ##### Determind battery source change by deter_pin
+                * ##### Auto change battery threshold
+        1. ### Translate remote user guide
+        2. ### Optimize cpp code structure
 
-#####  Turquo   2021/01/06
+#####  Turquo   2021/01/19
