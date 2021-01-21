@@ -20,11 +20,13 @@ class MyServerCallback : public BLEServerCallbacks {
 	}
 };
 
-void ProtoGun_setCMD(uint16_t cmd)
+bool ProtoGun_setCMD(uint16_t cmd)
 {
-	if (BLE_connected && BLE_buffer_index < (Buffer_max - 1))
+	if ((BLE_connected && BLE_buffer_index < (Buffer_max - 1)) || BLE_offline_force_sent)
 	{
 		BLE_buffer_index++;
 		BLE_value[BLE_buffer_index] = (ProtoGen_ID << 12) + (cmd & 0x0FFF);
+		return 1;
 	}
+	return 0;
 }

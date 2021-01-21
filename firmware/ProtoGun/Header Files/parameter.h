@@ -90,12 +90,17 @@ enum _BLE_mode
 
 enum _VM_mode
 {
-	VM_mode_boost		= 0xFF,
-	VM_mode_off			= 0xF0,
-	VM_mode_general		= 0x00,
-	VM_mode_on_long,
-	VM_mode_on_short,
-	VM_mode_on_extra,
+	VM_mode_boost			= 0xFF,
+	VM_mode_off				= 0xF0,
+	VM_mode_on_short		= 0x00,
+	VM_mode_on_short_twice,
+	VM_mode_on_short_thrice,
+	VM_mode_on_long			= 0x10,
+	VM_mode_on_long_twice,
+	VM_mode_on_long_thrice,
+	VM_mode_on_extra_long	= 0x20,
+	VM_mode_on_extra_long_twice,
+	VM_mode_on_extra_long_thrice,
 };
 
 enum _GUI_mode
@@ -191,6 +196,21 @@ inline void EEPROM_Save(void)
 	EEPROM.commit();
 }
 
+inline void EEPROM_Save_offline(void)
+{
+	EEPROM.write(EEPROM_Addr_Saved, EEPROM_saved);
+	EEPROM.write(EEPROM_Addr_Fan_duty, Blaster.Fan_duty);
+	EEPROM.write(EEPROM_Addr_Face_startup_index, Blaster.Face_startup_index);
+	EEPROM.write(EEPROM_Addr_Face_toggle_index, Blaster.Face_toggle_index);
+	EEPROM.write(EEPROM_Addr_Matrix_Brightness, Blaster.Matrix_Brightness);
+	EEPROM.write(EEPROM_Addr_ADC_gain_HH, (Blaster.ADC_gain >> 24) & 0xFF);
+	EEPROM.write(EEPROM_Addr_ADC_gain_HL, (Blaster.ADC_gain >> 16) & 0xFF);
+	EEPROM.write(EEPROM_Addr_ADC_gain_LH, (Blaster.ADC_gain >> 8) & 0xFF);
+	EEPROM.write(EEPROM_Addr_ADC_gain_LL, Blaster.ADC_gain);
+
+	EEPROM.commit();
+}
+
 inline void EEPROM_Load(void)
 {
 	Blaster.Fan_duty = EEPROM.read(EEPROM_Addr_Fan_duty);
@@ -203,6 +223,15 @@ inline void EEPROM_Load(void)
 	Blaster.Beep_period = EEPROM.read(EEPROM_Addr_Beep_period);
 	Blaster.Beep_mode = EEPROM.read(EEPROM_Addr_Beep_mode);
 	Blaster.Neo_Brightness = EEPROM.read(EEPROM_Addr_Neo_brightness);
+	Blaster.ADC_gain = (EEPROM.read(EEPROM_Addr_ADC_gain_HH) << 24) + (EEPROM.read(EEPROM_Addr_ADC_gain_HL) << 16) + (EEPROM.read(EEPROM_Addr_ADC_gain_LH) << 8) + EEPROM.read(EEPROM_Addr_ADC_gain_LL);
+}
+
+inline void EEPROM_Load_offload(void)
+{
+	Blaster.Fan_duty = EEPROM.read(EEPROM_Addr_Fan_duty);
+	Blaster.Face_startup_index = EEPROM.read(EEPROM_Addr_Face_startup_index);
+	Blaster.Face_index = Blaster.Face_startup_index;
+	Blaster.Face_toggle_index = EEPROM.read(EEPROM_Addr_Face_toggle_index);
 	Blaster.ADC_gain = (EEPROM.read(EEPROM_Addr_ADC_gain_HH) << 24) + (EEPROM.read(EEPROM_Addr_ADC_gain_HL) << 16) + (EEPROM.read(EEPROM_Addr_ADC_gain_LH) << 8) + EEPROM.read(EEPROM_Addr_ADC_gain_LL);
 }
 
@@ -222,6 +251,19 @@ inline void System_Reset(void)
 
 	EEPROM.write(EEPROM_Addr_Saved, 0);
 	EEPROM.commit();
+}
+
+inline void System_Reset_offline(void)
+{
+	Blaster.Fan_duty = Fan_duty_init;
+	Blaster.Face_index = 0;
+	Blaster.Face_startup_index = 0;
+	Blaster.Face_toggle_index = 1;
+	Blaster.ADC_gain = ADC_gain_init;
+
+	EEPROM_Save_offline();
+	EEPROM.commit();
+
 }
 
 inline void parameter_init(void)
