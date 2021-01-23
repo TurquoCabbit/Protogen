@@ -121,6 +121,7 @@ void Fan_task(void * parameter)
 {
 	uint8_t mode = 0xFF;
 	bool Fan_status = 0;
+	uint32_t Fan_on_cnt = 0;
 	for (;;)
 	{
 		if (xQueueReceive(queue_Fan, &mode, portMAX_DELAY) == pdTRUE)
@@ -137,7 +138,7 @@ void Fan_task(void * parameter)
 				vTaskDelete(NULL);
 				break;
 			case Fan_mode_general:
-				if (Blaster.Fan_ready)
+				if (Blaster.Fan_ready && Fan_on_cnt < Fan_on_Max_time)
 				{
 					if (Get_But_press(&But_Trigger) && !Fan_status)
 					{
@@ -159,6 +160,10 @@ void Fan_task(void * parameter)
 						Fan_status = 0;
 						Set_pwm(50, Fan_channel);
 					}
+					if(Fan_status)
+					{
+						Fan_on_cnt += Fan_scan_cycle_time;
+					}
 					vTaskDelay(Fan_scan_cycle_time / portTICK_PERIOD_MS);
 					Fan_mode(Fan_mode_general);
 				}
@@ -168,6 +173,10 @@ void Fan_task(void * parameter)
 					{
 						Fan_status = 0;
 						Set_pwm(50, Fan_channel);
+					}
+					if(Fan_on_cnt)
+					{
+						Fan_on_cnt = 0;
 					}
 				}
 				break;

@@ -20,7 +20,6 @@
 #define Fan_channel		0
 
 #define Fan_freq		500
-#define Fan_on_Max_time	60000	//in ms
 #define Fan_scan_cycle_time	50	//in ms
 
 #define LED_channel		2
@@ -114,17 +113,17 @@ void button_scan(_Button *pButton)
 	if (!digitalRead(pButton->But))  //first press
 	{
 		pButton->cnt++;
-		if (pButton->cnt > debouncing_times && !pButton->flag)
+		if (pButton->cnt > debouncing_times && !pButton->flag)	//pass debouncing time
 		{
 			pButton->flag = But_press;
 		}
 	}
-	else if (pButton->flag == But_CD)
+	else if (pButton->flag == But_CD)	//task done wait here
 	{
 		pButton->cnt = 0;
 		pButton->flag = 0;
 	}
-	else if (pButton->cnt > debouncing_times)
+	else if (pButton->cnt > debouncing_times)	//release
 	{
 		pButton->cnt = 0;
 		pButton->flag = But_release;

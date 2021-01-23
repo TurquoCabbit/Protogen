@@ -1,4 +1,5 @@
 #define Fan_duty_init	100
+#define Fan_on_Max_time	30000	//in ms
 
 #define V_motor_duration_long	60
 #define V_motor_duration_short	30
