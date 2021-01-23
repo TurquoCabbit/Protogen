@@ -1,4 +1,7 @@
-#define ADC_average_time 100
+#define ADC_init_average_time	10 		//in ms
+#define ADC_init_scan_intervial	1		//in ms
+#define ADC_average_time 		5000	//in ms
+#define ADC_scan_intervial		50		//in ms
 
 #define Blaster_install 1
 
@@ -22,15 +25,23 @@ _Battery_level Battery_level;
 
 inline void ADC_init(void)
 {
-	serial_log(0, "ADC_init_START");
 	adc1_config_width(ADC_WIDTH_BIT_12);
 	adc1_config_channel_atten(ADC1_CHANNEL_4, ADC_ATTEN_DB_0);  //full-scale voltage is 1.1V
-	serial_log(0, "ADC_init_DONE");
+	adc1_config_width(ADC_WIDTH_BIT_12);
+	adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_0);  //full-scale voltage is 1.1V
 }
 
-uint32_t ADC_convert(void)
+inline uint32_t ADC_convert(bool remote)
 {
-	return (uint32_t)(adc1_get_raw(ADC1_CHANNEL_4) * 1600);
+	if(remote)
+	{
+		return (uint32_t)(adc1_get_raw(ADC1_CHANNEL_4) * 1600);
+	}
+	else
+	{
+		return (uint32_t)(adc1_get_raw(ADC1_CHANNEL_3) * 1600);
+	}
+	
 }
 
 uint32_t float_int_converter(float temp)

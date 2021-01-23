@@ -67,7 +67,8 @@ enum _Fan_mode
 
 enum _ADC_mode
 {
-	ADC_mode_boost		= 0xFF,
+	ADC_mode_pre_boost	= 0xFF,
+	ADC_mode_boost		= 0xFE,
 	ADC_mode_off		= 0xF0,
 	ADC_mode_general	= 0x00,
 	ADC_mode_calculation
