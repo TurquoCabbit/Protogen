@@ -206,8 +206,13 @@ while(True):
         else:
             remote_theme_path = 0
         remote_theme_path = remote_theme_list[(int)(remote_theme_path)]
-
-        file_list = open('../output/Protogen_list.txt', 'r')
+        
+        try:
+            file_list = open('../output/Protogen_list.txt', 'r')
+        except:
+            file_list = open('../output/Protogen_list.txt', 'w')
+            file_list.close()
+            file_list = open('../output/Protogen_list.txt', 'r')
         protogen_ID = len(file_list.readlines())
         file_list.close()
         protogen = '{:0>2d}'.format(protogen_ID) + '. ' + protogen_name
