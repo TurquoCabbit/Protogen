@@ -1508,7 +1508,10 @@ void GUI_task(void * parameter)
 				if (show)
 				{
 					show = 0;
-					tft.pushImage(0, 0, 135, 240, Signature[temp_16]);
+					tft.pushImage(0, 0, 135, 240, Signature_BG[temp_16]);
+					#ifdef has_sig
+					tft.pushImage(0, 0, 135, 240, Signature[temp_16], TFT_BLACK);
+					#endif
 				}
 
 				if (Encoder_up)
@@ -1523,7 +1526,7 @@ void GUI_task(void * parameter)
 				else if (Encoder_down)
 				{
 					Encoder_down = 0;
-					if (temp_16 < 1)
+					if (temp_16 < sizeof(Signature_BG) / 64800 - 1)
 					{
 						temp_16++;
 						show = 1;

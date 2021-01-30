@@ -21,6 +21,8 @@
 
 #define BLE_offline_force_sent 0
 
+#define two_page_sign 0
+
 #define do_serial	0
 #if do_serial
     #define serial_log(header, data) {Serial.print(header);Serial.print(" -> ");Serial.println(data);}

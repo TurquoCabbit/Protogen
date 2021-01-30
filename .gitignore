@@ -29,6 +29,7 @@ PCB/lib/
 firmware/image/clip
 firmware/image/Protogen
 firmware/image/QR_code
+firmware/image/backup
 
 
 ### Altium ###
