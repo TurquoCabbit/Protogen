@@ -59,13 +59,12 @@ eye_array = []
 nose_array = []
 mouth_array = []
 
-if os.path.isdir('../../image/Jpg/' + protogen_path):
-    rmtree('../../image/Jpg/' + protogen_path)
-os.mkdir('../../image/Jpg/' + protogen_path)
+if not os.path.isdir('../../image/Protogen/' + protogen_path):
+    os.mkdir('../../image/Protogen/' + protogen_path)
 
 for ws in range(start_sheet ,sheet_num):    
     face_name = wb[wb.worksheets[ws].title]['E32'].value
-    save_path = '../../image/Jpg/' + protogen_path + '{:0>2d}_'.format(ws - start_sheet) + face_name + '.png'
+    save_path = '../../image/Protogen/' + protogen_path + '{:0>2d}_'.format(ws - start_sheet) + face_name + '.png'
     eye_array = wb[wb.worksheets[ws].title]['X12'].value.split(',', 16)
     nose_array = wb[wb.worksheets[ws].title]['N10'].value.split(',', 8)
     mouth_array = wb[wb.worksheets[ws].title]['E30'].value.split(',', 32)
@@ -112,7 +111,7 @@ wb.close()
 
 jpg_list_Batt = os.listdir('../../image/color_theme/' + remote_theme_path + 'Batt/')
 jpg_list_BLE = os.listdir('../../image/color_theme/' + remote_theme_path + 'BLE/')
-jpg_list_Face = os.listdir('../../image/Jpg/' + protogen_path)
+jpg_list_Face = os.listdir('../../image/Protogen/' + protogen_path)
 jpg_list_Lit = os.listdir('../../image/color_theme/' + remote_theme_path + 'Lit/')
 jpg_list_Sig = os.listdir('../../image/color_theme/' + remote_theme_path + 'Sig/')
 
@@ -265,7 +264,7 @@ file_image.write('\n};\n\n')
 ##################################################################################################
 file_image.write('const uint16_t Face[][18900] = {')
 for j in jpg_list_Face:
-    im = Image.open('../../image/Jpg/' + protogen_path + j)
+    im = Image.open('../../image/Protogen/' + protogen_path + j)
     im = im.transpose(Image.FLIP_LEFT_RIGHT)
     im = im.transpose(Image.ROTATE_90)
 
