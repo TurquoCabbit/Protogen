@@ -21,7 +21,11 @@ def color_threshold(color_in):
         return '255'
 
 def remove_and_shift_folder(root_path, protogen_serial_to_del):
-    folder_list = os.listdir(root_path)
+    folder_list = []
+    folder_list_row = os.listdir(root_path)
+    for i in folder_list_row:
+        if i.split('. ')[0].isdigit():
+            folder_list.append(i)
 
     for k in range(len(folder_list)):
         if folder_list[k].split('. ')[0].isnumeric():
@@ -239,7 +243,7 @@ while(True):
         file_ID.write('#define ProtoGun_Name "ProtoBlaster_' + '{:0>2d}'.format(protogen_ID) + '"\n')
         file_ID.close()
 
-        print('\nProtogen  ' + protogen.split(' ')[1] + '  has been created!!')
+        print('\nProtogen  ' + protogen + '  has been created!!')
         continue
     else:
         while(True):
