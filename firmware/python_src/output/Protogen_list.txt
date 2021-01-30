@@ -1,2 +1,0 @@
-00. Spoon	(23,230,187)	00. cyber_neo
-01. Baguette	(255,130,0)	00. cyber_neo

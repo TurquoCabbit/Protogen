@@ -11,14 +11,6 @@ firmware/*.rar
 ### old firmware ###
 firmware/00.old/
 
-### Protogen_Matrix ###
-firmware/Protogen_matrixs/build_temp/
-firmware/Protogen_matrixs/.vscode/
-
-### ProtoGun ###
-firmware/ProtoGun/build_temp/
-firmware/ProtoGun/.vscode/
-
 ### PCB file ###
 PCB/ref/
 PCB/ver1/
@@ -27,10 +19,15 @@ PCB/lib/
 
 ### Image file ###
 firmware/image/clip
-firmware/image/Protogen
 firmware/image/QR_code
 firmware/image/backup
 
+
+### Header file ###
+firmware/Protogen_matrixs/Header Files/Face.h
+firmware/Protogen_matrixs/Header Files/BLEID.h
+firmware/ProtoGun/Header Files/image.h
+firmware/ProtoGun/Header Files/BLEID.h
 
 ### Altium ###
 *.PrjPCBStructure
