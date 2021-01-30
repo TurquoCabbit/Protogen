@@ -59,13 +59,12 @@ eye_array = []
 nose_array = []
 mouth_array = []
 
-if os.path.isdir('../../image/Jpg/' + protogen_path):
-    rmtree('../../image/Jpg/' + protogen_path)
-os.mkdir('../../image/Jpg/' + protogen_path)
+if not os.path.isdir('../../image/Protogen/' + protogen_path):
+    os.mkdir('../../image/Protogen/' + protogen_path)
 
 for ws in range(start_sheet ,sheet_num):    
     face_name = wb[wb.worksheets[ws].title]['E32'].value
-    save_path = '../../image/Jpg/' + protogen_path + '{:0>2d}_'.format(ws - start_sheet) + face_name + '.png'
+    save_path = '../../image/Protogen/' + protogen_path + '{:0>2d}_'.format(ws - start_sheet) + face_name + '.png'
     eye_array = wb[wb.worksheets[ws].title]['X12'].value.split(',', 16)
     nose_array = wb[wb.worksheets[ws].title]['N10'].value.split(',', 8)
     mouth_array = wb[wb.worksheets[ws].title]['E30'].value.split(',', 32)
@@ -96,7 +95,20 @@ for ws in range(start_sheet ,sheet_num):
     im_nose = im_nose.rotate(20, resample = Image.BICUBIC, expand = True)
     im_mouth = im_mouth.rotate(10, resample = Image.BICUBIC, expand = True)
 
-    im_empty = Image.open('../../image/color_theme/' + remote_theme_path + 'Face/Face_empty.png')
+    # try:
+    #     im_empty = Image.open('../../image/color_theme/' + remote_theme_path + 'Face/Face_empty.png')
+    # except:
+    #     print('Face_empty.png image file is missing')
+    #     os.system('pause')
+    #     os._exit(0)
+    try:
+        im_list = os.listdir('../../image/color_theme/' + remote_theme_path + 'Face/')
+    except:
+        print('Face_empty image file is missing')
+        os.system('pause')
+        os._exit(0)
+    im_empty = Image.open('../../image/color_theme/' + remote_theme_path + 'Face/' + im_list[0])
+    #im_empty = Image.open('../../image/color_theme/' + remote_theme_path + 'Face/Face_empty.png')
     im_empty.paste(im_eye, (55,30), mask = im_eye)
     im_empty.paste(im_nose, (8,78), mask = im_nose)
     im_empty.paste(im_mouth, (24,96), mask = im_mouth)
@@ -109,12 +121,41 @@ for ws in range(start_sheet ,sheet_num):
 wb.close()
 
 ##################################################################################################
+try:
+    jpg_list_Batt = os.listdir('../../image/color_theme/' + remote_theme_path + 'Batt/')
+except:
+    print('Battery image file is missing')
+    os.system('pause')
+    os._exit(0)
 
-jpg_list_Batt = os.listdir('../../image/color_theme/' + remote_theme_path + 'Batt/')
-jpg_list_BLE = os.listdir('../../image/color_theme/' + remote_theme_path + 'BLE/')
-jpg_list_Face = os.listdir('../../image/Jpg/' + protogen_path)
-jpg_list_Lit = os.listdir('../../image/color_theme/' + remote_theme_path + 'Lit/')
-jpg_list_Sig = os.listdir('../../image/color_theme/' + remote_theme_path + 'Sig/')
+try:
+    jpg_list_BLE = os.listdir('../../image/color_theme/' + remote_theme_path + 'BLE/')
+except:
+    print('BLE image file is missing')
+    os.system('pause')
+    os._exit(0)
+
+try:
+    jpg_list_Lit = os.listdir('../../image/color_theme/' + remote_theme_path + 'Lit/')
+except:
+    print('Lit image file is missing')
+    os.system('pause')
+    os._exit(0)
+
+try:
+    jpg_list_Sig_bg = os.listdir('../../image/color_theme/' + remote_theme_path + 'Sig/')
+except:
+    print('Sig_bg image file is missing')
+    os.system('pause')
+    os._exit(0)
+
+if os.path.isdir('../../image/Protogen/' + protogen_path + 'Sig'):
+    jpg_list_Sig = os.listdir('../../image/Protogen/' + protogen_path + 'Sig/')
+    has_sig = 1
+else:
+    has_sig = 0
+
+jpg_list_Face = os.listdir('../../image/Protogen/' + protogen_path)
 
 file_image = open('../output/image.h', 'w')
 
@@ -237,8 +278,8 @@ im.close()
 file_image.write('};\n\n')
 
 ##################################################################################################
-file_image.write('const uint16_t Signature[][32400] = {')
-for j in jpg_list_Sig:
+file_image.write('const uint16_t Signature_BG[][32400] = {')
+for j in jpg_list_Sig_bg:
     im = Image.open('../../image/color_theme/' + remote_theme_path + 'Sig/' + j)
     im = im.transpose(Image.FLIP_LEFT_RIGHT)
     im = im.transpose(Image.ROTATE_90)
@@ -260,12 +301,40 @@ for j in jpg_list_Sig:
                 line = 0
     file_image.write('},')
     im.close()
-file_image.write('\n};\n\n')
+file_image.write('\n};\n')
+
+if has_sig == 1:
+    file_image.write('const uint16_t Signature[][32400] = {')
+    for j in jpg_list_Sig:
+        im = Image.open('../../image/Protogen/' + protogen_path + 'Sig/' + j)
+        im = im.transpose(Image.FLIP_LEFT_RIGHT)
+        im = im.transpose(Image.ROTATE_90)
+
+        pixels = im.load() # this is not a list, nor is it list()'able
+        width, height = im.size
+    
+        file_image.write('\n\t{')
+        line = 0
+        for x in range(width):
+            for y in range(height):
+                line += 1
+                R = pixels[x, y][0] >> 3
+                G = pixels[x, y][1] >> 2
+                B = pixels[x, y][2] >> 3
+                file_image.write((hex((R << 11) + (G << 5) + B)) + ', ')
+                if line == 16:
+                    file_image.write('\n\t')
+                    line = 0
+        file_image.write('},')
+        im.close()
+    file_image.write('\n};\n')
+    file_image.write('#define\thas_sig\t1\n')
+file_image.write('\n')
 
 ##################################################################################################
 file_image.write('const uint16_t Face[][18900] = {')
-for j in jpg_list_Face:
-    im = Image.open('../../image/Jpg/' + protogen_path + j)
+for j in range(len(jpg_list_Face) - has_sig):
+    im = Image.open('../../image/Protogen/' + protogen_path + jpg_list_Face[j])
     im = im.transpose(Image.FLIP_LEFT_RIGHT)
     im = im.transpose(Image.ROTATE_90)
 
@@ -289,14 +358,14 @@ for j in jpg_list_Face:
 file_image.write('\n};\n\n')
 
 file_image.write('#define Face_index_top\t\t' + hex(len(jpg_list_Face) - 1) + '\n')
-for j in range(len(jpg_list_Face)):
+for j in range(len(jpg_list_Face) - has_sig):
     Face = jpg_list_Face[j].split('.')[0]
     Face = Face.split('_')[1]
     file_image.write('#define Face_index_' + Face + '\t' + hex(j) + '\n')
 file_image.write('\n')
 
 file_image.write('const uint16_t Face_cmd[] = {\n')
-for j in range(len(jpg_list_Face)):    
+for j in range(len(jpg_list_Face) - has_sig):    
     file_image.write('\t' + hex(512 + j) + ',\n')
 file_image.write('};\n')
 

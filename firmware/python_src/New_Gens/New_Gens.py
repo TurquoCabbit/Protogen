@@ -53,9 +53,9 @@ def do_rename(protogen, new_name):
         os.remove('../output/Protogen_list.txt')
         os.rename('../output/Protogen_list_bak.txt', '../output/Protogen_list.txt')
 
-        if os.path.isdir('../../image/Jpg/' + protogen):
-            rmtree('../../image/Jpg/' + protogen)
-            os.mkdir('../../image/Jpg/' + protogen_number + '. ' + new_name)
+        if os.path.isdir('../../image/Protogen/' + protogen):
+            rmtree('../../image/Protogen/' + protogen)
+            os.mkdir('../../image/Protogen/' + protogen_number + '. ' + new_name)
 
         if os.path.isdir('../Configure/' + protogen):
             os.rename('../Configure/' + protogen, '../Configure/' + protogen_number + '. ' + new_name)
@@ -84,9 +84,9 @@ def do_recolor(protogen, R, G, B):
         os.remove('../output/Protogen_list.txt')
         os.rename('../output/Protogen_list_bak.txt', '../output/Protogen_list.txt')
 
-        if os.path.isdir('../../image/Jpg/' + protogen):
-            rmtree('../../image/Jpg/' + protogen)
-            os.mkdir('../../image/Jpg/' + protogen)
+        if os.path.isdir('../../image/Protogen/' + protogen):
+            rmtree('../../image/Protogen/' + protogen)
+            os.mkdir('../../image/Protogen/' + protogen)
 
         return True
     except:
@@ -112,9 +112,9 @@ def do_retheme(protogen, theme):
         os.remove('../output/Protogen_list.txt')
         os.rename('../output/Protogen_list_bak.txt', '../output/Protogen_list.txt')
 
-        if os.path.isdir('../../image/Jpg/' + protogen):
-            rmtree('../../image/Jpg/' + protogen)
-            os.mkdir('../../image/Jpg/' + protogen)
+        if os.path.isdir('../../image/Protogen/' + protogen):
+            rmtree('../../image/Protogen/' + protogen)
+            os.mkdir('../../image/Protogen/' + protogen)
         
         return True
     except:
@@ -130,7 +130,7 @@ def do_delete(protogen):
         file_list.close()
         protogen_serial_to_del = (int)(protogen.split('.')[0])
 
-        remove_and_shift_folder('../../image/Jpg/', protogen_serial_to_del)
+        remove_and_shift_folder('../../image/Protogen/', protogen_serial_to_del)
         remove_and_shift_folder('../Configure/', protogen_serial_to_del)
 
         list_f = open('../output/Protogen_list.txt', 'r')
@@ -216,8 +216,8 @@ while(True):
         file_list.write(protogen + '\t(' + color_R + ',' + color_G + ',' + color_B + ')\t' + remote_theme_path +'\n')
         file_list.close()
 
-        if not os.path.isdir('../../image/Jpg/' + protogen):
-            os.mkdir('../../image/Jpg/' + protogen)
+        if not os.path.isdir('../../image/Protogen/' + protogen):
+            os.mkdir('../../image/Protogen/' + protogen)
 
         if not os.path.isdir('../Configure/' + protogen):
             os.mkdir('../Configure/' + protogen)

@@ -89,26 +89,13 @@ void setup()
 
 	serial_log(0, "create task done");
 
-	if (digitalRead(Deter_PIN)) //remote
-	{
-		Blaster.Fan_ready = 0;
-		Blaster.remote = 1;
-		serial_log(0, "remote");
-	}
-	else //Gun
-	{
-		Blaster.Fan_ready = 1;
-		Blaster.remote = 0;
-		serial_log(0, "GUN");
-	}
-
 	if (EEPROM.read(EEPROM_Addr_Saved) == EEPROM_saved)
 	{
 		EEPROM_Load();
 		serial_log(0, "Load EEPROM done");
 	}
 
-	ADC_mode(ADC_mode_boost);
+	ADC_mode(ADC_mode_pre_boost);
 }
 
 void loop()
@@ -188,8 +175,9 @@ void Fan_task(void * parameter)
 void ADC_task(void * parameter)
 {
 	uint8_t mode = 0xFF;
-	bool initialed = 0;
-	uint16_t ADC_average_cnt = 0;
+	bool Deter_pin_temp = 0;
+	uint8_t ADC_initiated = 0;
+	uint32_t ADC_average_cnt = 0;
 	uint32_t ADC_average = 0;
 	for (;;)
 	{
@@ -197,26 +185,66 @@ void ADC_task(void * parameter)
 		{
 			switch (mode)
 			{
-			case ADC_mode_boost:
-				if (!initialed)
+			case ADC_mode_pre_boost:
+			
+				ADC_average_cnt = 0;
+				ADC_average = 0;
+				Blaster.remote = !digitalRead(Deter_PIN);
+				if (Blaster.remote)		//Blaster Deter_PIN high
 				{
-					Battery_level_init();
-					ADC_init();
-					initialed = 1;
-					vTaskDelay(10 / portTICK_PERIOD_MS);
+					Blaster.Fan_ready = 0;
+					serial_log(0, "remote");
 				}
-				if (ADC_convert() > Battery_level.Break)
+				else					//Remote Deter_PIN low
 				{
-					Ctrl_mode(Ctrl_mode_boost);
+					Blaster.Fan_ready = 1;
+					serial_log(0, "BLASTER");
+				}
+				if(!ADC_initiated)
+				{
+					ADC_init();
+					ADC_initiated = 1;
+				}
+				Battery_level_init();
+				Deter_pin_temp = Blaster.remote;
+				vTaskDelay(5 / portTICK_PERIOD_MS);
+
+			case ADC_mode_boost:
+				if(ADC_average_cnt < ADC_init_average_time)
+				{
+					Blaster.remote = !digitalRead(Deter_PIN);
+					ADC_average += ADC_convert(Blaster.remote);
+					ADC_average_cnt += ADC_init_scan_intervial;
+					vTaskDelay(ADC_init_scan_intervial / portTICK_PERIOD_MS);
 				}
 				else
 				{
-					serial_log(0, "BATT LOW");
-					serial_log(0, ADC_average);
-					serial_log(0, Battery_level.Break);
-					vTaskDelay(100 / portTICK_PERIOD_MS);
-					ADC_mode(ADC_mode_boost);
+					Blaster.ADC_value = ADC_average / (ADC_init_average_time / ADC_init_scan_intervial);
+					ADC_average_cnt = 0;
+					ADC_average = 0;
+					if (Blaster.ADC_value > Battery_level.Break && ADC_initiated == 1)
+					{
+						ADC_initiated = 2;
+						Ctrl_mode(Ctrl_mode_boost);
+					}
+					else
+					{
+						serial_log(0, "BATT LOW");
+						serial_log(0, ADC_average);
+						serial_log(0, Battery_level.Break);
+						ADC_mode(ADC_mode_boost);
+					}
 				}
+
+				if(Blaster.remote != Deter_pin_temp)
+				{
+					ADC_mode(ADC_mode_pre_boost);
+				}
+				else
+				{
+					Deter_pin_temp = Blaster.remote;
+				}
+				ADC_mode(ADC_mode_boost);
 				break;
 
 			case ADC_mode_off:
@@ -224,23 +252,24 @@ void ADC_task(void * parameter)
 				break;
 
 			case ADC_mode_general:
+				Blaster.remote = !digitalRead(Deter_PIN);
 				if (ADC_average_cnt < ADC_average_time)
 				{
-					ADC_average += ADC_convert();
-					ADC_average_cnt++;
+					ADC_average += ADC_convert(Blaster.remote);
+					ADC_average_cnt += ADC_scan_intervial;
 				}
 				else
 				{
-					Blaster.ADC_value = ADC_average / ADC_average_time;
-					ADC_average_cnt = 0;
-					ADC_average = 0;
 					ADC_mode(ADC_mode_calculation);
 				}
-				vTaskDelay(5 / portTICK_PERIOD_MS);
+				vTaskDelay(ADC_scan_intervial / portTICK_PERIOD_MS);
 				ADC_mode(ADC_mode_general);
 				break;
 
-			case ADC_mode_calculation:
+			case ADC_mode_calculation:			
+				Blaster.ADC_value = ADC_average / (ADC_average_time / ADC_scan_intervial);
+				ADC_average_cnt = 0;
+				ADC_average = 0;
 				if (Blaster.ADC_value < Battery_level.Break && Blaster.Power_Low)
 				{
 					Blaster.Power_Low = 1;
@@ -1479,7 +1508,10 @@ void GUI_task(void * parameter)
 				if (show)
 				{
 					show = 0;
-					tft.pushImage(0, 0, 135, 240, Signature[temp_16]);
+					tft.pushImage(0, 0, 135, 240, Signature_BG[temp_16]);
+					#ifdef has_sig
+					tft.pushImage(0, 0, 135, 240, Signature[temp_16], TFT_BLACK);
+					#endif
 				}
 
 				if (Encoder_up)
@@ -1494,7 +1526,7 @@ void GUI_task(void * parameter)
 				else if (Encoder_down)
 				{
 					Encoder_down = 0;
-					if (temp_16 < 1)
+					if (temp_16 < sizeof(Signature_BG) / 64800 - 1)
 					{
 						temp_16++;
 						show = 1;
@@ -1522,6 +1554,7 @@ void Ctrl_task(void * parameter)
 {
 	uint8_t mode = 0xFF;
 	uint8_t pos_old, pos_now;
+	bool Deter_pin_temp = Blaster.remote;
 	TickType_t tick;
 	tick = xTaskGetTickCount();
 	for (;;)
@@ -1595,6 +1628,17 @@ void Ctrl_task(void * parameter)
 				{
 					LCD_refresh_cnt.Face_resume++;
 				}
+
+				Blaster.remote = !digitalRead(Deter_PIN);
+				if(Blaster.remote != Deter_pin_temp)
+				{
+					ADC_mode(ADC_mode_pre_boost);
+				}
+				else
+				{
+					Deter_pin_temp = Blaster.remote;
+				}
+				
 				vTaskDelayUntil(&tick, 1 / portTICK_PERIOD_MS);
 				Ctrl_mode(Ctrl_mode_general);
 				break;
