@@ -23,6 +23,7 @@ firmware/ProtoGun/.vscode/
 PCB/ref/
 PCB/ver1/
 PCB/ver2/
+PCB/lib/
 
 ### Altium ###
 *.PrjPCBStructure
