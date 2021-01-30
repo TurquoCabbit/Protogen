@@ -25,6 +25,12 @@ PCB/ver1/
 PCB/ver2/
 PCB/lib/
 
+### Image file ###
+firmware/image/clip
+firmware/image/Protogen
+firmware/image/QR_code
+
+
 ### Altium ###
 *.PrjPCBStructure
 *.SchDocPreview
