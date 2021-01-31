@@ -545,6 +545,7 @@ void GUI_task(void * parameter)
 					serial_log(0, "Signature");
 					VM_mode(VM_mode_on_long);
 					temp_16 = GUI_temp16_init;
+					temp_32 = GUI_temp32_init;
 					show = 1;
 					GUI_mode(GUI_mode_signature);
 				}
@@ -1500,15 +1501,20 @@ void GUI_task(void * parameter)
 
 			case GUI_mode_signature:
 				sleep_mode = mode;
-				if (temp_16 == GUI_temp16_init)
+				if (temp_16 == GUI_temp16_init || temp_32 == GUI_temp32_init)
 				{
 					temp_16 = 0;
+					#ifdef has_sig
+					temp_32 = (sizeof(Signature) / 64800) - 1;
+					#else
+					temp_32 = 0;
+					#endif
 				}
 
 				if (show)
 				{
 					show = 0;
-					tft.pushImage(0, 0, 135, 240, Signature_BG[temp_16]);
+					tft.pushImage(0, 0, 135, 240, Signature_BG[0]);
 					#ifdef has_sig
 					tft.pushImage(0, 0, 135, 240, Signature[temp_16], TFT_BLACK);
 					#endif
@@ -1526,7 +1532,7 @@ void GUI_task(void * parameter)
 				else if (Encoder_down)
 				{
 					Encoder_down = 0;
-					if (temp_16 < sizeof(Signature_BG) / 64800 - 1)
+					if (temp_16 < temp_32)
 					{
 						temp_16++;
 						show = 1;
