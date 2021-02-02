@@ -1505,7 +1505,7 @@ void GUI_task(void * parameter)
 				{
 					temp_16 = 0;
 					#ifdef has_sig
-					temp_32 = (sizeof(Signature) / 64800) - 1;
+					temp_32 = has_sig - 1;
 					#else
 					temp_32 = 0;
 					#endif
