@@ -7,7 +7,13 @@ from shutil import rmtree
 from PIL import Image
 from PIL import ImageDraw
 
-file_list = open('../output/Protogen_list.txt', 'r')
+try:
+    file_list = open('../output/Protogen_list.txt', 'r')
+except:
+    print('Run New_Gens.exe to create protogen first!!')
+    os.system('pause')
+    os._exit(0)
+
 protogen_list = file_list.readlines()
 file_list.close()
 print('Choose Protogen：')
@@ -123,35 +129,49 @@ wb.close()
 ##################################################################################################
 try:
     jpg_list_Batt = os.listdir('../../image/color_theme/' + remote_theme_path + 'Batt/')
+    for i in jpg_list_Batt:
+        im = Image.open('../../image/color_theme/' + remote_theme_path + 'Batt/' + i)
+        im.close()
 except:
-    print('Battery image file is missing')
+    print('Battery image file is missing or wrong name')
     os.system('pause')
     os._exit(0)
 
 try:
     jpg_list_BLE = os.listdir('../../image/color_theme/' + remote_theme_path + 'BLE/')
+    im = Image.open('../../image/color_theme/' + remote_theme_path + 'BLE/Connected.jpg')
+    im.close()
 except:
-    print('BLE image file is missing')
+    print('BLE image file is missing or wrong name')
     os.system('pause')
     os._exit(0)
 
 try:
     jpg_list_Lit = os.listdir('../../image/color_theme/' + remote_theme_path + 'Lit/')
+    im = Image.open('../../image/color_theme/' + remote_theme_path + 'Lit/Max_lit.jpg') 
+    im.close()
+    im = Image.open('../../image/color_theme/' + remote_theme_path + 'Lit/general_lit.jpg')
+    im.close()
 except:
-    print('Lit image file is missing')
+    print('Lit image file is missing or wrong name')
     os.system('pause')
     os._exit(0)
 
 try:
     jpg_list_Sig_bg = os.listdir('../../image/color_theme/' + remote_theme_path + 'Sig/')
+    im = Image.open('../../image/color_theme/' + remote_theme_path + 'Sig/Signature_bg.jpg')
+    im.close()
 except:
-    print('Sig_bg image file is missing')
+    print('Signature_bg image file is missing or wrong name')
     os.system('pause')
     os._exit(0)
 
-if os.path.isdir('../../image/Protogen/' + protogen_path + 'Sig'):
-    jpg_list_Sig = os.listdir('../../image/Protogen/' + protogen_path + 'Sig/')
-    has_sig = 1
+if os.path.isdir('../Configure/' + protogen_path + 'Sig/'):
+    jpg_list_Sig = os.listdir('../Configure/' + protogen_path + 'Sig')
+    if len(jpg_list_Sig) > 0:
+        has_sig = 1
+    else:
+        has_sig = 0
 else:
     has_sig = 0
 
@@ -279,34 +299,33 @@ file_image.write('};\n\n')
 
 ##################################################################################################
 file_image.write('const uint16_t Signature_BG[][32400] = {')
-for j in jpg_list_Sig_bg:
-    im = Image.open('../../image/color_theme/' + remote_theme_path + 'Sig/' + j)
-    im = im.transpose(Image.FLIP_LEFT_RIGHT)
-    im = im.transpose(Image.ROTATE_90)
+im = Image.open('../../image/color_theme/' + remote_theme_path + 'Sig/Signature_bg.jpg')
+im = im.transpose(Image.FLIP_LEFT_RIGHT)
+im = im.transpose(Image.ROTATE_90)
 
-    pixels = im.load() # this is not a list, nor is it list()'able
-    width, height = im.size
- 
-    file_image.write('\n\t{')
-    line = 0
-    for x in range(width):
-        for y in range(height):
-            line += 1
-            R = pixels[x, y][0] >> 3
-            G = pixels[x, y][1] >> 2
-            B = pixels[x, y][2] >> 3
-            file_image.write((hex((R << 11) + (G << 5) + B)) + ', ')
-            if line == 16:
-                file_image.write('\n\t')
-                line = 0
-    file_image.write('},')
-    im.close()
+pixels = im.load() # this is not a list, nor is it list()'able
+width, height = im.size
+
+file_image.write('\n\t{')
+line = 0
+for x in range(width):
+    for y in range(height):
+        line += 1
+        R = pixels[x, y][0] >> 3
+        G = pixels[x, y][1] >> 2
+        B = pixels[x, y][2] >> 3
+        file_image.write((hex((R << 11) + (G << 5) + B)) + ', ')
+        if line == 16:
+            file_image.write('\n\t')
+            line = 0
+file_image.write('},')
+im.close()
 file_image.write('\n};\n')
 
 if has_sig == 1:
     file_image.write('const uint16_t Signature[][32400] = {')
     for j in jpg_list_Sig:
-        im = Image.open('../../image/Protogen/' + protogen_path + 'Sig/' + j)
+        im = Image.open('../Configure/' + protogen_path + 'Sig/' + j)
         im = im.transpose(Image.FLIP_LEFT_RIGHT)
         im = im.transpose(Image.ROTATE_90)
 
@@ -328,12 +347,12 @@ if has_sig == 1:
         file_image.write('},')
         im.close()
     file_image.write('\n};\n')
-    file_image.write('#define\thas_sig\t1\n')
+    file_image.write('#define\thas_sig\t{}\n'.format(len(jpg_list_Sig)))
 file_image.write('\n')
 
 ##################################################################################################
 file_image.write('const uint16_t Face[][18900] = {')
-for j in range(len(jpg_list_Face) - has_sig):
+for j in range(len(jpg_list_Face)):
     im = Image.open('../../image/Protogen/' + protogen_path + jpg_list_Face[j])
     im = im.transpose(Image.FLIP_LEFT_RIGHT)
     im = im.transpose(Image.ROTATE_90)
@@ -358,14 +377,14 @@ for j in range(len(jpg_list_Face) - has_sig):
 file_image.write('\n};\n\n')
 
 file_image.write('#define Face_index_top\t\t' + hex(len(jpg_list_Face) - 1) + '\n')
-for j in range(len(jpg_list_Face) - has_sig):
+for j in range(len(jpg_list_Face)):
     Face = jpg_list_Face[j].split('.')[0]
     Face = Face.split('_')[1]
     file_image.write('#define Face_index_' + Face + '\t' + hex(j) + '\n')
 file_image.write('\n')
 
 file_image.write('const uint16_t Face_cmd[] = {\n')
-for j in range(len(jpg_list_Face) - has_sig):    
+for j in range(len(jpg_list_Face)):    
     file_image.write('\t' + hex(512 + j) + ',\n')
 file_image.write('};\n')
 

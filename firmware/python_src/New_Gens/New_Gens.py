@@ -230,6 +230,7 @@ while(True):
 
         if not os.path.isdir('../Configure/' + protogen):
             os.mkdir('../Configure/' + protogen)
+            os.mkdir('../Configure/' + protogen + '/Sig')
             copy('../Configure/Template.xlsx', '../Configure/{}/Template.xlsx'.format(protogen))
             os.rename('../Configure/{}/Template.xlsx'.format(protogen), '../Configure/{}/LED_Matrix.xlsx'.format(protogen))
             

@@ -14,10 +14,14 @@ def pitch_conv(input):
     return 0
 
 file_music = open('../output/music.h', 'w')
-
 time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 file_music.write('//{}\n\n'.format(time))
-wb = load_workbook(filename = '../Configure/Music_Sheet.xlsx', data_only = True, read_only = True)
+try:
+    wb = load_workbook(filename = '../Configure/Music_Sheet.xlsx', data_only = True, read_only = True)
+except:
+    print('Missing Music_Sheet.xlsx')
+    os.system('pause')
+    os._exit(0)
 work_sheet_num = len(wb.worksheets)
 
 file_music.write('void * struct_init_dummy;\n\n')
@@ -70,4 +74,5 @@ wb.close()
 
 copyfile('../output/music.h', '../../Protogen_matrixs/Header Files/music.h')
 
+print('Music convert successfully!!')
 os.system('pause')
