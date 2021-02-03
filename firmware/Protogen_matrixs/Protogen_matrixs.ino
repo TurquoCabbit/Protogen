@@ -543,6 +543,7 @@ void BZ_task(void * parameter)
 			{
 			case BZ_mode_boost:
 				ledcAttachPin(BZ_PIN, BZ_channel);
+				srand(xTaskGetTickCount());
 				serial_log(00, "BZ_mode_boost");
 				break;
 
@@ -552,56 +553,36 @@ void BZ_task(void * parameter)
 				Protogen.music_playing = 0;
 				break;
 				
-			case BZ_mode_beep:
-				BZ_music(BZ_channel, Protogen.Beep_pitch & 0x0F, Protogen.Beep_pitch >> 4);
-				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
-				BZ_music(BZ_channel, 0);
-				break;
-
 			case BZ_mode_dobule_beep:
 				BZ_music(BZ_channel, Protogen.Beep_pitch & 0x0F, Protogen.Beep_pitch >> 4);
 				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
+
+			case BZ_mode_beep:
 				BZ_music(BZ_channel, Protogen.Beep_pitch & 0x0F, Protogen.Beep_pitch >> 4);
 				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
 				break;
-
-			case BZ_mode_rand_one:
-				srand(xTaskGetTickCount());
+				
+			case BZ_mode_rand_three:
 				rand_pitch = rand_beep();
 				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
 				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
-				break;
 
 			case BZ_mode_rand_two:
-				srand(xTaskGetTickCount());
 				rand_pitch = rand_beep();
 				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
 				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
 				BZ_music(BZ_channel, 0);
-				rand_pitch = rand_beep();
-				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
-				BZ_music(BZ_channel, 0);
-				break;
 
-			case BZ_mode_rand_three:
+			case BZ_mode_rand_one:
+				rand_pitch = rand_beep();
+				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
+				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
+				BZ_music(BZ_channel, 0);
 				srand(xTaskGetTickCount());
-				rand_pitch = rand_beep();
-				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
-				BZ_music(BZ_channel, 0);
-				rand_pitch = rand_beep();
-				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
-				BZ_music(BZ_channel, 0);
-				rand_pitch = rand_beep();
-				BZ_music(BZ_channel, rand_pitch & 0x0F, rand_pitch >> 4);
-				vTaskDelay(Beep_interval / portTICK_PERIOD_MS);
-				BZ_music(BZ_channel, 0);
 				break;
 				
 			case BZ_mode_music:
@@ -927,6 +908,7 @@ void BLE_task(void * parameter)
 									Protogen.animate_on = 1;
 									cnt.animate = 0;
 									Matrix_mode(Matrix_mode_scan + *Face_current.animate_mode);
+									BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
 								}
 								else
 								{
@@ -943,6 +925,7 @@ void BLE_task(void * parameter)
 									clear_face_buffer(index_mouth);
 									Matrix_refresh();
 									Matrix_mode(Matrix_mode_scan);
+									BZ_mode(BZ_mode_OFF);
 								}
 
 							}
@@ -970,7 +953,7 @@ void BLE_task(void * parameter)
 
 					case CMD_Face:	//Face
 						matrix_face_set(face_ptr_rack[BLE_cmd[BLE_buffer_index] & 0xFF]);
-						BZ_mode(BZ_mode_BLE_set);
+						BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
 						Matrix_mode(Matrix_mode_scan + *Face_current.animate_mode);
 						Neopixel_mode(Neopixel_mode_set);
 						break;
