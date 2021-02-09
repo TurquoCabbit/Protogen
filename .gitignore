@@ -26,6 +26,7 @@ firmware/image/backup
 ### Header file ###
 firmware/Protogen_matrixs/Header Files/Face.h
 firmware/Protogen_matrixs/Header Files/BLEID.h
+firmware/Protogen_matrixs/Header Files/music.h
 firmware/ProtoGun/Header Files/image.h
 firmware/ProtoGun/Header Files/BLEID.h
 
