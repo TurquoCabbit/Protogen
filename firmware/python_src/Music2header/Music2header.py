@@ -4,6 +4,7 @@ from datetime import datetime
 from openpyxl import load_workbook
 from shutil import copyfile
 
+loading_bar = ["\\", "|", "/", "—"]
 
 pitch_array = ['0', 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B']
 def pitch_conv(input):
@@ -27,16 +28,19 @@ work_sheet_num = len(wb.worksheets)
 file_music.write('void * struct_init_dummy;\n\n')
 for ws in range(2 ,work_sheet_num):
     work_sheet = wb[wb.worksheets[ws].title]
-    music_name = work_sheet['G1'].value
-    tempo = work_sheet['I2'].value
-    ring_time = work_sheet['I3'].value
-    length = work_sheet['I4'].value
+    if work_sheet['K12'].value == 'OFF':
+        continue
+    music_name = work_sheet['J1'].value
+    tempo = work_sheet['L2'].value
+    ring_time = work_sheet['L3'].value
+    length = work_sheet['L4'].value
 
     file_music.write('_sheet {}_sheet[{}] = \n'.format(music_name, length + 1))
     file_music.write('{\n\t')
     file_music.write('{0, 4, 16, 0}, \n')
     
     for i in range(2, length + 2):
+        print('\r{}'.format(loading_bar[i % 4]), end = '')
         file_music.write('\t{')
         file_music.write('{}, '.format(pitch_conv(work_sheet['B{}'.format(i)].value)))
         file_music.write('{}, '.format(work_sheet['C{}'.format(i)].value))
@@ -64,7 +68,9 @@ file_music.write('_music * music_ptr_rack[] =\n{\n')
 ser = 0
 for ws in range(2 ,work_sheet_num):
     work_sheet = wb[wb.worksheets[ws].title]
-    music_name = work_sheet['G1'].value
+    if work_sheet['K12'].value == 'OFF':
+        continue
+    music_name = work_sheet['J1'].value
     ser += 1
     file_music.write('\t(_music *)(&{}),\t\t//0x{:0>2d}\n'.format(music_name, ser))
 file_music.write('};')
