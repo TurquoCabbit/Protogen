@@ -46,8 +46,12 @@ file_face.write('//' + time + '\t\t' + protogen_ID + '_' + protogen_name + '\n\n
 wb = load_workbook(filename = '../Configure/{}LED_Matrix.xlsx'.format(protogen_path), data_only = True, read_only = True)
 sheet_num = len(wb.worksheets)
 start_sheet = 11
+face_off_num = 0
 for ws in range(start_sheet ,sheet_num):
     value = wb[wb.worksheets[ws].title]['E33'].value
+    if not value:
+        continue
+
     file_face.write(value)
     file_face.write('\n')
 
@@ -55,6 +59,9 @@ file_face.write('\n')
 file_face.write('_face * face_ptr_rack[] =\n{\n')
 
 for ws in range(start_sheet ,sheet_num):
+    value = wb[wb.worksheets[ws].title]['E33'].value
+    if not value:
+        continue
     value = wb[wb.worksheets[ws].title]['E32'].value
     file_face.write('\t(_face *)(&Face_{}),\t\t//{}\n'.format(value, hex(ws - start_sheet)))
         
@@ -68,9 +75,13 @@ mouth_array = []
 if not os.path.isdir('../../image/Protogen/' + protogen_path):
     os.mkdir('../../image/Protogen/' + protogen_path)
 
-for ws in range(start_sheet ,sheet_num):    
+for ws in range(start_sheet ,sheet_num):
+    value = wb[wb.worksheets[ws].title]['E33'].value
+    if not value:
+        face_off_num += 1
+        continue
     face_name = wb[wb.worksheets[ws].title]['E32'].value
-    save_path = '../../image/Protogen/' + protogen_path + '{:0>2d}_'.format(ws - start_sheet) + face_name + '.png'
+    save_path = '../../image/Protogen/' + protogen_path + '{:0>2d}_'.format(ws - start_sheet - face_off_num) + face_name + '.png'
     eye_array = wb[wb.worksheets[ws].title]['X12'].value.split(',', 16)
     nose_array = wb[wb.worksheets[ws].title]['N10'].value.split(',', 8)
     mouth_array = wb[wb.worksheets[ws].title]['E30'].value.split(',', 32)
