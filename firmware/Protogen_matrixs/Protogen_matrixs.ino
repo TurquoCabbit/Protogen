@@ -610,6 +610,7 @@ void BZ_task(void * parameter)
 					vTaskDelay(megalovania_note_time[j] / portTICK_PERIOD_MS);
 				}
 				*/
+				j = 0;
 				if(*(Face_current.piece))
 				{
 					play_now = music_ptr_rack[*(Face_current.piece) - 1];
@@ -625,6 +626,7 @@ void BZ_task(void * parameter)
 						{
 							ledcWrite(BZ_channel, 0);
 						}
+						/*
 						j = 0;
 						while (j < 8)
 						{
@@ -633,6 +635,28 @@ void BZ_task(void * parameter)
 								break;
 							}
 							j++;
+						}
+						*/
+						switch(play_now->sheet[i].note)
+						{
+							case 32:
+								j = 5;
+								break;
+							case 16:
+								j = 4;
+								break;
+							case 8:
+								j = 3;
+								break;
+							case 4:
+								j = 2;
+								break;
+							case 2:
+								j = 1;
+								break;
+							case 1:
+								j = 0;
+								break;
 						}
 						vTaskDelay((play_now->note[j] - play_now->ring_time) / portTICK_PERIOD_MS);
 					}

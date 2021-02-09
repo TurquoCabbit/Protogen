@@ -162,10 +162,10 @@ void * ptr_dummy;
 
 typedef struct _sheet
 {
-	uint8_t pitch;
-	uint8_t octave;
-	uint8_t note;
-	bool joined;
+	uint8_t pitch	:4;
+	uint8_t octave	:4;
+	uint8_t note	:7;
+	uint8_t joined	:1;
 };//pitch,  octave,  beat,  if joined note
 
 typedef struct _music
