@@ -6,13 +6,43 @@ from shutil import copyfile
 
 loading_bar = ["\\", "|", "/", "—"]
 
-pitch_array = ['0', 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B']
+#pitch_array = ['0', 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B']
+#                0    1    2     3    4     5    6    7     8    9     10   11    12
 def pitch_conv(input):
-    i = 0
-    for i in range(len(pitch_array)):
-        if input == pitch_array[i]:
-            return i
-    return 0
+    # i = 0
+    # for i in range(len(pitch_array)):
+    #     if input == pitch_array[i]:
+    #         return i
+    # return 0
+    if input == '0':
+        return 0
+    elif input == 'C' or input == 'c':
+        return 1
+    elif input == 'C#' or input == 'c#':
+        return 2
+    elif input == 'D' or input == 'd':
+        return 3
+    elif input == 'Eb' or input == 'EB' or input == 'eb' or input == 'eB':
+        return 4
+    elif input == 'E' or input == 'e':
+        return 5
+    elif input == 'F' or input == 'f':
+        return 6
+    elif input == 'F#'  or input == 'f#':
+        return 7
+    elif input == 'G' or input == 'g':
+        return 8
+    elif input == 'G#' or input == 'g#':
+        return 9
+    elif input == 'A' or input == 'a':
+        return 10
+    elif input == 'Bb' or input == 'BB' or input == 'bb' or input == 'bB':
+        return 11
+    elif input == 'B' or input == 'b':
+        return 12
+    else:
+        return 0
+
 
 file_music = open('../output/music.h', 'w')
 time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
