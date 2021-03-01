@@ -30,32 +30,6 @@ firmware/Protogen_matrixs/Header Files/music.h
 firmware/ProtoGun/Header Files/image.h
 firmware/ProtoGun/Header Files/BLEID.h
 
-### Altium ###
-*.PrjPCBStructure
-*.SchDocPreview
-*.PcbDocPreview
-__Previews
-*.PrjPcbStructure
-*.Dat
-*.REP 
-*.TLT
-*.LOG
-*.log
-*.htm
-*.$$$
-
-#useless dirs
-Project\ Outputs
-Project\ Logs
-Project Outputs for*
-
-#History
-History
-
-#Exports, but not manual ones
-exports/*
-!exports/manual
-
 #Python stuff
 scripts/__pycache__/
 *.bak
