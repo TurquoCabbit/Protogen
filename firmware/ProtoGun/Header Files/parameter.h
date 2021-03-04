@@ -135,11 +135,11 @@ enum _GUI_mode
 
 typedef struct _system_status
 {
-	bool Power_Low;
-	bool Power_Break;
-	bool Fan_ready;
-	uint8_t Battery;
-	bool remote;
+	bool Power_Low		:1;
+	bool Power_Break	:1;
+	bool Fan_ready		:1;
+	bool remote			:1;
+	uint8_t Battery		:4;
 	uint32_t ADC_value;
 
 	uint8_t Fan_duty;

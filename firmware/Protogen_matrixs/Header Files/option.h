@@ -19,7 +19,7 @@
 #define beep_time           100   //in ms
 
 //Protosence
-#define Protosence_on			1
+#define Protosence_init			1
 #define Protosence_scan_cycle	10 //in 10ms
 #define Protosence_hold			100	//in 10ms
 

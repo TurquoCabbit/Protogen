@@ -188,22 +188,22 @@ typedef struct _cnt
 
 typedef struct _system
 {
-	uint8_t matrix_refresh;
 	uint16_t Blink_period;
 	uint8_t Beep_mode;
 	uint8_t Beep_pitch;
 	uint16_t Beep_period;
-	uint8_t Protosence_flag;
 	uint8_t Matrix_Brightness;
 	uint8_t Startup_Face;
 	uint8_t Neo_Brightness;
 
-
-	bool show_eye;
-	bool show_nose;
-	bool show_mouth;
-	bool animate_on;
-	bool music_playing;
+	bool dummy				:1;
+	bool Protosence_flag	:1;
+	bool matrix_refresh		:1;
+	bool show_eye			:1;
+	bool show_nose			:1;
+	bool show_mouth			:1;
+	bool animate_on			:1;
+	bool music_playing		:1;
 };
 
 _cnt cnt;
@@ -260,10 +260,11 @@ inline void System_Reset(void)
 	Protogen.Beep_mode = Beep_mode_init;
 	Protogen.Beep_pitch = Beep_pitch_init;
 	Protogen.Beep_period = Beep_cycle;
-	Protogen.Protosence_flag = Protosence_on;
-	Protogen.Matrix_Brightness = Matrix_brightness_init;
+	Protogen.Protosence_flag = Protosence_init;
 	Protogen.Startup_Face = 0;
+	Protogen.Matrix_Brightness = Matrix_brightness_init;
 	Protogen.Neo_Brightness = neo_ring_brightness;
+	Protogen.matrix_refresh = 1;
 	Protogen.show_eye = 1;
 	Protogen.show_nose = 1;
 	Protogen.show_mouth = 1;
@@ -287,15 +288,15 @@ inline void parameter_init(void)
 	cnt.animate		 	= 0;
 	cnt.BLE_reconnect 	= 0;
 
-	Protogen.matrix_refresh = 1;
 	Protogen.Blink_period = eye_blink_cycle;
 	Protogen.Beep_mode = Beep_mode_init;
 	Protogen.Beep_pitch = Beep_pitch_init;
 	Protogen.Beep_period = Beep_cycle;
-	Protogen.Protosence_flag = Protosence_on;
+	Protogen.Protosence_flag = Protosence_init;
 	Protogen.Matrix_Brightness = Matrix_brightness_init;
 	Protogen.Startup_Face = 0;
 	Protogen.Neo_Brightness = neo_ring_brightness;
+	Protogen.matrix_refresh = 1;
 	Protogen.show_eye = 1;
 	Protogen.show_nose = 1;
 	Protogen.show_mouth = 1;

@@ -57,7 +57,7 @@ const char *Boop_list[boop_list_top + 1] = {
 	"  ON"
 };
 
-typedef struct _cnt
+typedef struct _LCD_cnt
 {
 	uint8_t main;
 	uint8_t info;
@@ -66,7 +66,7 @@ typedef struct _cnt
 	uint16_t ADC;
 };
 
-_cnt LCD_refresh_cnt = { 0 };
+_LCD_cnt LCD_refresh_cnt = { 0 };
 
 uint32_t LCD_sleep_cnt = 0;
 

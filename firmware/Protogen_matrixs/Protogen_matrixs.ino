@@ -921,7 +921,7 @@ void BLE_task(void * parameter)
 							cnt.Blink = 0;
 							break;
 						case 0x40:	//Boop
-							Protogen.Protosence_flag = BLE_cmd[BLE_buffer_index] & 0x0F;
+							Protogen.Protosence_flag = BLE_cmd[BLE_buffer_index] & 0x01;
 							cnt.Protosence = 0;
 							break;
 						case 0xA0:	//play animate
