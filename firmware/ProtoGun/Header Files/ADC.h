@@ -1,7 +1,9 @@
-#define ADC_init_average_time	10 		//in ms
+#define ADC_init_average_time	20 		//in ms
 #define ADC_init_scan_intervial	1		//in ms
+#define ADC_init_pause_time 			ADC_init_average_time	//in ms
 #define ADC_average_time 		5000	//in ms
 #define ADC_scan_intervial		50		//in ms
+#define ADC_pause_time 			ADC_average_time	//in ms
 
 #define Blaster_install 1
 
@@ -22,6 +24,8 @@ typedef struct _Battery_level
 };
 
 _Battery_level Battery_level;
+
+#define Get_Deter_pin(pin) {!digitalRead(pin)}
 
 inline void ADC_init(void)
 {

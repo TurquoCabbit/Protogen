@@ -121,7 +121,7 @@ void Fan_task(void * parameter)
 				Fan_mode(Fan_mode_general);
 				break;
 			case Fan_mode_off:
-				Set_pwm(50, Fan_channel);
+				Set_pwm(0, Fan_channel);
 				vTaskDelete(NULL);
 				break;
 			case Fan_mode_general:
@@ -176,7 +176,7 @@ void ADC_task(void * parameter)
 {
 	uint8_t mode = 0xFF;
 	bool Deter_pin_temp = 0;
-	uint8_t ADC_initiated = 0;
+	bool ADC_initiated = 0;
 	uint32_t ADC_average_cnt = 0;
 	uint32_t ADC_average = 0;
 	for (;;)
@@ -189,13 +189,13 @@ void ADC_task(void * parameter)
 			
 				ADC_average_cnt = 0;
 				ADC_average = 0;
-				Blaster.remote = !digitalRead(Deter_PIN);
-				if (Blaster.remote)		//Blaster Deter_PIN high
+				Blaster.remote = Get_Deter_pin(Deter_PIN);
+				if (Blaster.remote)		//Blaster Deter_PIN low
 				{
 					Blaster.Fan_ready = 0;
 					serial_log(0, "remote");
 				}
-				else					//Remote Deter_PIN low
+				else					//Remote Deter_PIN high
 				{
 					Blaster.Fan_ready = 1;
 					serial_log(0, "BLASTER");
@@ -206,16 +206,23 @@ void ADC_task(void * parameter)
 					ADC_initiated = 1;
 				}
 				Battery_level_init();
-				Deter_pin_temp = Blaster.remote;
+				Deter_pin_temp = Get_Deter_pin(Deter_PIN);
 				vTaskDelay(5 / portTICK_PERIOD_MS);
 
 			case ADC_mode_boost:
 				if(ADC_average_cnt < ADC_init_average_time)
 				{
-					Blaster.remote = !digitalRead(Deter_PIN);
-					ADC_average += ADC_convert(Blaster.remote);
-					ADC_average_cnt += ADC_init_scan_intervial;
-					vTaskDelay(ADC_init_scan_intervial / portTICK_PERIOD_MS);
+					if(Blaster.remote != Deter_pin_temp)
+					{
+						ADC_mode(ADC_mode_pre_boost);
+					}
+					else
+					{
+						ADC_average += ADC_convert(Blaster.remote);
+						ADC_average_cnt += ADC_init_scan_intervial;
+						Deter_pin_temp = Get_Deter_pin(Deter_PIN);
+						vTaskDelay(ADC_init_scan_intervial / portTICK_PERIOD_MS);
+					}
 				}
 				else
 				{
@@ -224,45 +231,39 @@ void ADC_task(void * parameter)
 					ADC_average = 0;
 					if (Blaster.ADC_value > Battery_level.Break && ADC_initiated == 1)
 					{
-						ADC_initiated = 2;
 						Ctrl_mode(Ctrl_mode_boost);
 					}
 					else
 					{
-						serial_log(0, "BATT LOW");
+						serial_log(0, "BATT BREAK");
 						serial_log(0, ADC_average);
 						serial_log(0, Battery_level.Break);
-						ADC_mode(ADC_mode_boost);
+						ADC_mode(ADC_mode_terminate);
 					}
-				}
-
-				if(Blaster.remote != Deter_pin_temp)
-				{
-					ADC_mode(ADC_mode_pre_boost);
-				}
-				else
-				{
-					Deter_pin_temp = Blaster.remote;
+					vTaskDelay(ADC_init_pause_time / portTICK_PERIOD_MS);
 				}
 				ADC_mode(ADC_mode_boost);
 				break;
 
-			case ADC_mode_off:
-				vTaskDelete(NULL);
-				break;
-
 			case ADC_mode_general:
-				Blaster.remote = !digitalRead(Deter_PIN);
 				if (ADC_average_cnt < ADC_average_time)
 				{
-					ADC_average += ADC_convert(Blaster.remote);
-					ADC_average_cnt += ADC_scan_intervial;
+					if(Blaster.remote != Deter_pin_temp)
+					{
+						ADC_mode(ADC_mode_pre_boost);
+					}
+					else
+					{
+						ADC_average += ADC_convert(Blaster.remote);
+						ADC_average_cnt += ADC_scan_intervial;
+						Deter_pin_temp = Get_Deter_pin(Deter_PIN);
+						vTaskDelay(ADC_scan_intervial / portTICK_PERIOD_MS);
+					}
 				}
 				else
 				{
 					ADC_mode(ADC_mode_calculation);
 				}
-				vTaskDelay(ADC_scan_intervial / portTICK_PERIOD_MS);
 				ADC_mode(ADC_mode_general);
 				break;
 
@@ -270,17 +271,13 @@ void ADC_task(void * parameter)
 				Blaster.ADC_value = ADC_average / (ADC_average_time / ADC_scan_intervial);
 				ADC_average_cnt = 0;
 				ADC_average = 0;
+				serial_log("ADC", Blaster.ADC_value);
 				if (Blaster.ADC_value < Battery_level.Break && Blaster.Power_Low)
 				{
 					Blaster.Power_Low = 1;
 					Blaster.Power_Break = 1;
 					Blaster.Fan_ready = 0;
-					GUI_mode(GUI_mode_off);
-					Fan_mode(Fan_mode_off);
-					Ctrl_mode(Ctrl_mode_off);
-					BLE_mode(BLE_mode_off);
-					VM_mode(VM_mode_off);
-					ADC_mode(ADC_mode_off);
+					ADC_mode(ADC_mode_terminate);
 				}
 				else if (Blaster.ADC_value < Battery_level.Low)
 				{
@@ -294,8 +291,28 @@ void ADC_task(void * parameter)
 				}
 				Blaster.Battery = (Blaster.ADC_value - Battery_level.Break) * 5 / (Battery_level.Full - Battery_level.Break);
 				LCD_refresh_cnt.ADC = 1;
-				vTaskDelay(5 / portTICK_PERIOD_MS);
+				vTaskDelay(ADC_pause_time / portTICK_PERIOD_MS);
+				if(Blaster.remote != Deter_pin_temp)
+				{
+					ADC_mode(ADC_mode_pre_boost);
+				}
+				else
+				{
+					Deter_pin_temp = Get_Deter_pin(Deter_PIN);
+				}
 				ADC_mode(ADC_mode_general);
+				break;
+				
+			case ADC_mode_terminate:
+				GUI_mode(GUI_mode_off);
+				Fan_mode(Fan_mode_off);
+				Ctrl_mode(Ctrl_mode_off);
+				BLE_mode(BLE_mode_off);
+				VM_mode(VM_mode_off);
+				vTaskDelay(20 / portTICK_PERIOD_MS);
+
+			case ADC_mode_off:
+				vTaskDelete(NULL);
 				break;
 			}
 		}
@@ -315,6 +332,7 @@ void GUI_task(void * parameter)
 	bool show = 0;
 	bool toggled = 0;
 	char temp_str[20];
+	bool LCD_initiated = 0;
 	for (;;)
 	{
 		if (xQueueReceive(queue_GUI, &mode, portMAX_DELAY) == pdTRUE)
@@ -322,7 +340,11 @@ void GUI_task(void * parameter)
 			switch (mode)
 			{
 			case GUI_mode_boost:
-				LCD_init();
+				if(!LCD_initiated)
+				{
+					LCD_init();
+					LCD_initiated = 1;
+				}
 				Face_show_index = Blaster.Face_index;
 				clear_encoder_flag();
 				GUI_mode(GUI_mode_main);
@@ -330,7 +352,10 @@ void GUI_task(void * parameter)
 				break;
 
 			case GUI_mode_off:
-				tft.fillScreen(TFT_WHITE);  // clean screen
+				if(LCD_initiated)
+				{
+					tft.fillScreen(TFT_WHITE);  // clean screen
+				}
 				digitalWrite(TFT_BL, 0); //turn off backlight
 				vTaskDelete(NULL);
 				break;
@@ -1673,6 +1698,8 @@ void BLE_task(void * parameter)
 	pServer->setCallbacks(new MyServerCallback);
 	BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
 
+	bool BLE_initiated = 0;
+
 	for (;;)
 	{
 		if (xQueueReceive(queue_BLE, &mode, portMAX_DELAY) == pdTRUE)
@@ -1680,16 +1707,20 @@ void BLE_task(void * parameter)
 			switch (mode)
 			{
 			case BLE_mode_boost:
-				pService->start();
+				if(!BLE_initiated)
+				{
+					pService->start();
 
-				pAdvertising->addServiceUUID(SERVICE_UUID);
-				pAdvertising->setScanResponse(true);
-				pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
-				pAdvertising->setMinPreferred(0x12);
-				BLEDevice::startAdvertising();
+					pAdvertising->addServiceUUID(SERVICE_UUID);
+					pAdvertising->setScanResponse(true);
+					pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+					pAdvertising->setMinPreferred(0x12);
+					BLEDevice::startAdvertising();
+					BLE_initiated = 1;
+				}
 				break;
 			case BLE_mode_notify:
-				if (BLE_connected && BLE_buffer_index > -1)
+				if (BLE_initiated && BLE_connected && BLE_buffer_index > -1)
 				{
 					serial_log("BLE cmd", BLE_value[BLE_buffer_index]);
 					pCharacteristic->setValue(BLE_value[BLE_buffer_index]);
@@ -1700,8 +1731,11 @@ void BLE_task(void * parameter)
 				}
 				break;
 			case BLE_mode_off:
-				pService->stop();
-				BLEDevice::deinit(true);
+				if(BLE_initiated)
+				{
+					pService->stop();
+					BLEDevice::deinit(true);
+				}
 				vTaskDelete(NULL);
 				break;
 			}
