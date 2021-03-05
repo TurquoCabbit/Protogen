@@ -4,7 +4,22 @@ from datetime import datetime
 from openpyxl import load_workbook
 from shutil import copyfile
 
-loading_bar = ["\\", "|", "/", "—"]
+def progress_change(item, percent):
+    if percent == 'OFF':
+        progress = 'OFF'
+        for i in range(3, 50):
+            progress += '_'
+        print('\r|{}|   0% {}'.format(progress, item), end = '')
+    else:
+        progress = ''
+        for i in range(50):
+            if i <= percent / 2 - 1:
+                progress += '█'
+            else:
+                progress += '_'
+        print('\r|{}| {:>3d}% {}'.format(progress, int(percent), item), end = '')
+
+
 
 #pitch_array = ['0', 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B']
 #                0    1    2     3    4     5    6    7     8    9     10   11    12
@@ -58,19 +73,22 @@ work_sheet_num = len(wb.worksheets)
 file_music.write('void * struct_init_dummy;\n\n')
 for ws in range(2 ,work_sheet_num):
     work_sheet = wb[wb.worksheets[ws].title]
-    if work_sheet['K12'].value == 'OFF':
-        continue
     music_name = work_sheet['J1'].value
     tempo = work_sheet['L2'].value
     ring_time = work_sheet['L3'].value
     length = work_sheet['L4'].value
+
+    if work_sheet['K12'].value == 'OFF':
+        progress_change(music_name, 'OFF')
+        print('')
+        continue
 
     file_music.write('_sheet {}_sheet[{}] = \n'.format(music_name, length + 1))
     file_music.write('{\n\t')
     file_music.write('{0, 4, 16, 0}, \n')
     
     for i in range(2, length + 2):
-        print('\r{}'.format(loading_bar[i % 4]), end = '')
+        progress_change(music_name, (i - 2) / length * 100)
         file_music.write('\t{')
         file_music.write('{}, {}, {}, {}'.format(pitch_conv(work_sheet['B{}'.format(i)].value), work_sheet['C{}'.format(i)].value, work_sheet['D{}'.format(i)].value, work_sheet['E{}'.format(i)].value))
         # file_music.write('{}, '.format(pitch_conv(work_sheet['B{}'.format(i)].value)))
@@ -94,6 +112,8 @@ for ws in range(2 ,work_sheet_num):
     file_music.write('\t},\n')
     file_music.write('\t{},\n'.format(ring_time))
     file_music.write('};\n\n')
+    progress_change(music_name, 100)
+    print('')
 
 file_music.write('_music * music_ptr_rack[] =\n{\n')
 ser = 0
