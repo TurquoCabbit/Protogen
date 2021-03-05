@@ -8,16 +8,16 @@ def progress_change(item, percent):
     if percent == 'OFF':
         progress = 'OFF'
         for i in range(3, 50):
-            progress += '_'
-        print('\r|{}|   0% {}'.format(progress, item), end = '')
+            progress += ' '
+        print('\r[{}]   0% {}'.format(progress, item), end = '')
     else:
         progress = ''
         for i in range(50):
             if i <= percent / 2 - 1:
-                progress += '█'
+                progress += '.'
             else:
-                progress += '_'
-        print('\r|{}| {:>3d}% {}'.format(progress, int(percent), item), end = '')
+                progress += ' '
+        print('\r[{}] {:>3d}% {}'.format(progress, int(percent), item), end = '')
 
 
 
