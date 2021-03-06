@@ -66,15 +66,52 @@ inline void queue_init(void)
 	}
 }
 
-#define Neopixel_mode(mode)		xQueueSend(queue_Neopixel, queue_mode + mode, 0)
-#define Matrix_mode(mode)		xQueueSend(queue_Matrix, queue_mode + mode, 0)
-#define Eye_mode(mode)			xQueueSend(queue_Eye, queue_mode + mode, 0)
-#define Nose_mode(mode)			xQueueSend(queue_Nose, queue_mode + mode, 0)
-#define Mouth_mode(mode)		xQueueSend(queue_Mouth, queue_mode + mode, 0)
-#define BZ_mode(mode)			xQueueSend(queue_BZ, queue_mode + mode, 0)
-#define Fan_mode(mode)			xQueueSend(queue_Fan, queue_mode + mode, 0)
-#define Ctrl_mode(mode)			xQueueSend(queue_Ctrl, queue_mode + mode, 0)
-#define BLE_mode(mode)			xQueueSend(queue_BLE, queue_mode + mode, 0)
+#if Neopixel_fsm_log
+    #define Neopixel_mode(mode)		{xQueueSend(queue_Neopixel, queue_mode + mode, 0); serial_log("Neo_fsm", mode);}
+#else
+    #define Neopixel_mode(mode)		xQueueSend(queue_Neopixel, queue_mode + mode, 0)
+#endif
+#if Matrix_fsm_log
+    #define Matrix_mode(mode)		{xQueueSend(queue_Matrix, queue_mode + mode, 0); serial_log("Matrix_fsm", mode);}
+#else
+    #define Matrix_mode(mode)		xQueueSend(queue_Matrix, queue_mode + mode, 0)
+#endif
+#if Eye_fsm_log
+    #define Eye_mode(mode)			{xQueueSend(queue_Eye, queue_mode + mode, 0); serial_log("Eye_fsm", mode);}
+#else
+    #define Eye_mode(mode)			xQueueSend(queue_Eye, queue_mode + mode, 0)
+#endif
+#if Nose_fsm_log
+    #define Nose_mode(mode)			{xQueueSend(queue_Nose, queue_mode + mode, 0); serial_log("Nose_fsm", mode);}
+#else
+    #define Nose_mode(mode)			xQueueSend(queue_Nose, queue_mode + mode, 0)
+#endif
+#if Mouth_fsm_log
+    #define Mouth_mode(mode)		{xQueueSend(queue_Mouth, queue_mode + mode, 0); serial_log("Mouth_fsm", mode);}
+#else
+    #define Mouth_mode(mode)		xQueueSend(queue_Mouth, queue_mode + mode, 0)
+#endif
+#if BZ_fsm_log
+    #define BZ_mode(mode)			{xQueueSend(queue_BZ, queue_mode + mode, 0); serial_log("BZ_fsm", mode);}
+#else
+    #define BZ_mode(mode)			xQueueSend(queue_BZ, queue_mode + mode, 0)
+#endif
+#if Fan_fsm_log
+    #define Fan_mode(mode)			{xQueueSend(queue_Fan, queue_mode + mode, 0); serial_log("Fan_fsm", mode);}
+#else
+    #define Fan_mode(mode)			xQueueSend(queue_Fan, queue_mode + mode, 0)
+#endif
+#if Ctrl_fsm_log
+    #define Ctrl_mode(mode)			{xQueueSend(queue_Ctrl, queue_mode + mode, 0); serial_log("Ctrl_fsm", mode);}
+#else
+    #define Ctrl_mode(mode)			xQueueSend(queue_Ctrl, queue_mode + mode, 0)
+#endif
+#if BLE_fsm_log
+    #define BLE_mode(mode)			{xQueueSend(queue_BLE, queue_mode + mode, 0); serial_log("BLE_fsm", mode);}
+#else
+    #define BLE_mode(mode)			xQueueSend(queue_BLE, queue_mode + mode, 0)
+#endif
+
 
 enum _BZ_mode
 {

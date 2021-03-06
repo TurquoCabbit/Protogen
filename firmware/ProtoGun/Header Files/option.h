@@ -26,6 +26,12 @@
 #define do_serial	0
 #if do_serial
     #define serial_log(header, data) {Serial.print(header);Serial.print(" -> ");Serial.println(data);}
+    #define Fan_fsm_log     0
+    #define ADC_fsm_log     0
+    #define Ctrl_fsm_log    0
+    #define BLE_fsm_log     0
+    #define VM_fsm_log      0
+    #define GUI_fsm_log     0
 #else
     #define serial_log(header, data) {}
 #endif

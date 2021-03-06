@@ -34,6 +34,16 @@
 #define do_serial 0
 #if do_serial
     #define serial_log(header, data) {Serial.print(header);Serial.print(" -> ");Serial.println(data);}
+    #define Neopixel_fsm_log    0
+    #define Matrix_fsm_log      0
+    #define Eye_fsm_log         0
+    #define Nose_fsm_log        0
+    #define Mouth_fsm_log       0
+    #define BZ_fsm_log          0
+    #define Fan_fsm_log         0
+    #define Ctrl_fsm_log        0
+    #define BLE_fsm_log         0
+    
 #else
     #define serial_log(header, data) {}
 #endif

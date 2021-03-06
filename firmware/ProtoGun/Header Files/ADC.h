@@ -2,7 +2,7 @@
 #define ADC_init_scan_intervial	1		//in ms
 #define ADC_init_pause_time 			ADC_init_average_time	//in ms
 #define ADC_average_time 		5000	//in ms
-#define ADC_scan_intervial		50		//in ms
+#define ADC_scan_intervial		10		//in ms
 #define ADC_pause_time 			ADC_average_time	//in ms
 
 #define Blaster_install 1

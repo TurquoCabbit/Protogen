@@ -178,7 +178,7 @@ void ADC_task(void * parameter)
 	bool Deter_pin_temp = 0;
 	bool ADC_initiated = 0;
 	uint32_t ADC_average_cnt = 0;
-	uint32_t ADC_average = 0;
+	uint64_t ADC_average = 0;
 	for (;;)
 	{
 		if (xQueueReceive(queue_ADC, &mode, portMAX_DELAY) == pdTRUE)
@@ -186,9 +186,9 @@ void ADC_task(void * parameter)
 			switch (mode)
 			{
 			case ADC_mode_pre_boost:
-			
 				ADC_average_cnt = 0;
 				ADC_average = 0;
+				vTaskDelay(50 / portTICK_PERIOD_MS);
 				Blaster.remote = Get_Deter_pin(Deter_PIN);
 				if (Blaster.remote)		//Blaster Deter_PIN low
 				{
@@ -231,13 +231,14 @@ void ADC_task(void * parameter)
 					ADC_average = 0;
 					if (Blaster.ADC_value > Battery_level.Break && ADC_initiated == 1)
 					{
+						serial_log("Vol", (float)(Blaster.ADC_value) / Blaster.ADC_gain);
 						Ctrl_mode(Ctrl_mode_boost);
 					}
 					else
 					{
 						serial_log(0, "BATT BREAK");
-						serial_log(0, ADC_average);
-						serial_log(0, Battery_level.Break);
+						serial_log("Vol", (float)(Blaster.ADC_value) / Blaster.ADC_gain);
+						serial_log("Break", (float)(Battery_level.Break) / Blaster.ADC_gain);
 						ADC_mode(ADC_mode_terminate);
 					}
 					vTaskDelay(ADC_init_pause_time / portTICK_PERIOD_MS);
@@ -248,17 +249,10 @@ void ADC_task(void * parameter)
 			case ADC_mode_general:
 				if (ADC_average_cnt < ADC_average_time)
 				{
-					if(Blaster.remote != Deter_pin_temp)
-					{
-						ADC_mode(ADC_mode_pre_boost);
-					}
-					else
-					{
-						ADC_average += ADC_convert(Blaster.remote);
-						ADC_average_cnt += ADC_scan_intervial;
-						Deter_pin_temp = Get_Deter_pin(Deter_PIN);
-						vTaskDelay(ADC_scan_intervial / portTICK_PERIOD_MS);
-					}
+					ADC_average += ADC_convert(Blaster.remote);
+					ADC_average_cnt += ADC_scan_intervial;
+					Deter_pin_temp = Get_Deter_pin(Deter_PIN);
+					vTaskDelay(ADC_scan_intervial / portTICK_PERIOD_MS);
 				}
 				else
 				{
@@ -271,13 +265,16 @@ void ADC_task(void * parameter)
 				Blaster.ADC_value = ADC_average / (ADC_average_time / ADC_scan_intervial);
 				ADC_average_cnt = 0;
 				ADC_average = 0;
-				serial_log("ADC", Blaster.ADC_value);
+				serial_log("Vol", (float)(Blaster.ADC_value) / Blaster.ADC_gain);
 				if (Blaster.ADC_value < Battery_level.Break && Blaster.Power_Low)
 				{
 					Blaster.Power_Low = 1;
 					Blaster.Power_Break = 1;
 					Blaster.Fan_ready = 0;
-					ADC_mode(ADC_mode_terminate);
+					serial_log(0, "BATT BREAK");
+					serial_log("Vol", (float)(Blaster.ADC_value) / Blaster.ADC_gain);
+					serial_log("Break", (float)(Battery_level.Break) / Blaster.ADC_gain);
+					ESP.restart();
 				}
 				else if (Blaster.ADC_value < Battery_level.Low)
 				{
@@ -292,14 +289,6 @@ void ADC_task(void * parameter)
 				Blaster.Battery = (Blaster.ADC_value - Battery_level.Break) * 5 / (Battery_level.Full - Battery_level.Break);
 				LCD_refresh_cnt.ADC = 1;
 				vTaskDelay(ADC_pause_time / portTICK_PERIOD_MS);
-				if(Blaster.remote != Deter_pin_temp)
-				{
-					ADC_mode(ADC_mode_pre_boost);
-				}
-				else
-				{
-					Deter_pin_temp = Get_Deter_pin(Deter_PIN);
-				}
 				ADC_mode(ADC_mode_general);
 				break;
 				
@@ -309,7 +298,8 @@ void ADC_task(void * parameter)
 				Ctrl_mode(Ctrl_mode_off);
 				BLE_mode(BLE_mode_off);
 				VM_mode(VM_mode_off);
-				vTaskDelay(20 / portTICK_PERIOD_MS);
+				vTaskDelay(10 / portTICK_PERIOD_MS);
+				esp_deep_sleep_start();
 
 			case ADC_mode_off:
 				vTaskDelete(NULL);
@@ -613,6 +603,10 @@ void GUI_task(void * parameter)
 					show = 1;
 					temp_32 = GUI_temp32_init;
 					temp_16 = GUI_temp16_init;
+					if(setting_list_index == (GUI_mode_ADC - GUI_mode_startface))
+					{
+						LCD_refresh_cnt.ADC = 1;
+					}
 					GUI_mode(GUI_mode_startface + setting_list_index);
 				}
 				else if (Get_But(&But_Return, 1000))
@@ -1318,7 +1312,7 @@ void GUI_task(void * parameter)
 					tft.setCursor(0, 100);
 					tft.setTextColor(TFT_WHITE);
 					tft.setTextSize(1);
-					sprintf(temp_str, "  %.2f V", (float)(Blaster.ADC_value) / Blaster.ADC_gain);
+					sprintf(temp_str, "  %.3f V", (float)(Blaster.ADC_value) / Blaster.ADC_gain);
 
 					tft.printf(temp_str);
 
@@ -1353,7 +1347,7 @@ void GUI_task(void * parameter)
 					{
 						Blaster.ADC_gain = 0xFFFFFFFF;
 					}
-					show = 1;
+					LCD_refresh_cnt.ADC = 1;
 				}
 
 				if (Get_But(&But_Enter))
@@ -1491,8 +1485,7 @@ void GUI_task(void * parameter)
 				Font_set_min();
 				tft.setCursor(0, 100);
 				tft.setTextColor(TFT_WHITE);
-				tft.setTextSize(1);
-				tft.printf("\n Saving");				
+				tft.setTextSize(1);			
 
 				//first in last out
 
@@ -1585,7 +1578,7 @@ void Ctrl_task(void * parameter)
 {
 	uint8_t mode = 0xFF;
 	uint8_t pos_old, pos_now;
-	bool Deter_pin_temp = Blaster.remote;
+	bool Deter_pin_temp;
 	TickType_t tick;
 	tick = xTaskGetTickCount();
 	for (;;)
@@ -1660,14 +1653,10 @@ void Ctrl_task(void * parameter)
 					LCD_refresh_cnt.Face_resume++;
 				}
 
-				Blaster.remote = !digitalRead(Deter_PIN);
+				Deter_pin_temp = Get_Deter_pin(Deter_PIN);
 				if(Blaster.remote != Deter_pin_temp)
 				{
 					ADC_mode(ADC_mode_pre_boost);
-				}
-				else
-				{
-					Deter_pin_temp = Blaster.remote;
 				}
 				
 				vTaskDelayUntil(&tick, 1 / portTICK_PERIOD_MS);

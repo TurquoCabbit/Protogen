@@ -51,12 +51,37 @@ inline void queue_init(void)
 	}
 }
 
-#define Fan_mode(mode)	xQueueSend(queue_Fan, queue_mode + mode, 0)
-#define ADC_mode(mode)	xQueueSend(queue_ADC, queue_mode + mode, 0)
-#define Ctrl_mode(mode)	xQueueSend(queue_Ctrl, queue_mode + mode, 0)
-#define BLE_mode(mode)	xQueueSend(queue_BLE, queue_mode + mode, 0)
-#define VM_mode(mode)	xQueueSend(queue_VM, queue_mode + mode, 0)
-#define GUI_mode(mode)	xQueueSend(queue_GUI, queue_mode + mode, 0)
+#if Fan_fsm_log
+	#define Fan_mode(mode)	{xQueueSend(queue_Fan, queue_mode + mode, 0); serial_log("Fan_fsm", mode);}
+#else
+	#define Fan_mode(mode)	xQueueSend(queue_Fan, queue_mode + mode, 0)
+#endif
+#if ADC_fsm_log
+	#define ADC_mode(mode)	{xQueueSend(queue_ADC, queue_mode + mode, 0); serial_log("ADC_fsm", mode);}
+#else
+	#define ADC_mode(mode)	xQueueSend(queue_ADC, queue_mode + mode, 0)
+#endif
+#if Ctrl_fsm_log
+	#define Ctrl_mode(mode)	{xQueueSend(queue_Ctrl, queue_mode + mode, 0); serial_log("Ctrl_fsm", mode);}
+#else
+	#define Ctrl_mode(mode)	xQueueSend(queue_Ctrl, queue_mode + mode, 0)
+#endif
+#if BLE_fsm_log
+	#define BLE_mode(mode)	{xQueueSend(queue_BLE, queue_mode + mode, 0); serial_log("BLE_fsm", mode);}
+#else
+	#define BLE_mode(mode)	xQueueSend(queue_BLE, queue_mode + mode, 0)
+#endif
+#if VM_fsm_log
+	#define VM_mode(mode)	{xQueueSend(queue_VM, queue_mode + mode, 0); serial_log("VM_fsm", mode);}
+#else
+	#define VM_mode(mode)	xQueueSend(queue_VM, queue_mode + mode, 0)
+#endif
+#if GUI_fsm_log
+	#define GUI_mode(mode)	{xQueueSend(queue_GUI, queue_mode + mode, 0); serial_log("GUI_fsm", mode);}
+#else
+	#define GUI_mode(mode)	xQueueSend(queue_GUI, queue_mode + mode, 0)
+#endif
+
 
 enum _Fan_mode
 {
