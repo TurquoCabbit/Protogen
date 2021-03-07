@@ -8,11 +8,11 @@
 #define Blaster_install 1
 
 //Battery
-#define Battery_Break_Voltage_3	9
+#define Battery_Break_Voltage_3	9.3
 #define Battery_Low_Voltage_3	10
 #define Battery_Full_Voltage_3	12.6
 
-#define Battery_Break_Voltage_1	3
+#define Battery_Break_Voltage_1	3.1
 #define Battery_Low_Voltage_1	3.3  
 #define Battery_Full_Voltage_1	4.2
 
