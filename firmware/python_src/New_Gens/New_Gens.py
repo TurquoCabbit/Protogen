@@ -63,6 +63,8 @@ def do_rename(protogen, new_name):
 
         if os.path.isdir('../Configure/' + protogen):
             os.rename('../Configure/' + protogen, '../Configure/' + protogen_number + '. ' + new_name)
+            copy('../Configure/Template.xlsx', '../Configure/{}. {}/Template.xlsx'.format(protogen_number, new_name))
+            os.rename('../Configure/{}. {}/Template.xlsx'.format(protogen_number, new_name), '../Configure/{}. {}/LED_Matrix.xlsx'.format(protogen_number, new_name))
 
         return True
     except:

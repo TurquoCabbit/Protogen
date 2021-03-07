@@ -72,8 +72,10 @@ eye_array = []
 nose_array = []
 mouth_array = []
 
-if not os.path.isdir('../../image/Protogen/' + protogen_path):
-    os.mkdir('../../image/Protogen/' + protogen_path)
+if os.path.isdir('../../image/Protogen/' + protogen_path):
+    rmtree('../../image/Protogen/' + protogen_path)
+
+os.mkdir('../../image/Protogen/' + protogen_path)
 
 for ws in range(start_sheet ,sheet_num):
     value = wb[wb.worksheets[ws].title]['E33'].value

@@ -164,7 +164,8 @@ typedef struct _system_status
 	bool Power_Break	:1;
 	bool Fan_ready		:1;
 	bool remote			:1;
-	uint8_t Battery		:4;
+	bool Boop			:1;
+	uint8_t Battery		:3;
 	uint32_t ADC_value;
 
 	uint8_t Fan_duty;
@@ -173,7 +174,6 @@ typedef struct _system_status
 	uint8_t Face_toggle_index;
 	uint8_t Matrix_Brightness;
 	uint8_t Blink_period;
-	uint8_t Boop;
 	uint8_t Beep_period;
 	uint8_t Beep_mode;
 	uint8_t Neo_Brightness;
@@ -267,7 +267,14 @@ inline void System_Reset(void)
 	Blaster.Fan_duty = Fan_duty_init;
 	Blaster.Face_index = 0;
 	Blaster.Face_startup_index = 0;
-	Blaster.Face_toggle_index = 1;
+	if(Face_index_top > 0)
+	{
+		Blaster.Face_toggle_index = 1;
+	}
+	else
+	{
+		Blaster.Face_toggle_index = 0;
+	}
 	Blaster.Matrix_Brightness = Matrix_brightness_init;
 	Blaster.Blink_period = Blink_period_init;
 	Blaster.Boop = Boop_init;
@@ -304,7 +311,14 @@ inline void parameter_init(void)
 	Blaster.Fan_duty = Fan_duty_init;
 	Blaster.Face_index = 0;
 	Blaster.Face_startup_index = 0;
-	Blaster.Face_toggle_index = 1;
+	if(Face_index_top > 0)
+	{
+		Blaster.Face_toggle_index = 1;
+	}
+	else
+	{
+		Blaster.Face_toggle_index = 0;
+	}
 	Blaster.Matrix_Brightness = Matrix_brightness_init;
 	Blaster.Blink_period = Blink_period_init;
 	Blaster.Boop = Boop_init;

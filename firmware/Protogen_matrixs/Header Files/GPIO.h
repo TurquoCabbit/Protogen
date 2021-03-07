@@ -6,7 +6,7 @@
 #define IR_Rx_PIN		35	//boop sence rx
 
 #define BZ_channel	0
-#define IR_channel	2
+#define IR_channel	8
 #define IR_freq		38000
 
 #define Fan_on()   digitalWrite(FAN_PIN, 1)

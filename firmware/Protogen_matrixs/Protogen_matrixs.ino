@@ -617,48 +617,51 @@ void BZ_task(void * parameter)
 					Protogen.music_playing = 1;
 					for(i = 1; i < play_now->length; i++)
 					{
-						if (!play_now->sheet[i - 1].joined)  //if last note not joined note
+						if(Protogen.music_playing)
 						{
-							BZ_music(BZ_channel, play_now->sheet[i].pitch, play_now->sheet[i].octave);
-						}
-						vTaskDelay(play_now->ring_time / portTICK_PERIOD_MS);
-						if (!play_now->sheet[i].joined)  //if not joined note
-						{
-							ledcWrite(BZ_channel, 0);
-						}
-						/*
-						j = 0;
-						while (j < 8)
-						{
-							if (play_now->sheet[i].note >> j == 0x01)
+							if (!play_now->sheet[i - 1].joined)  //if last note not joined note
 							{
-								break;
+								BZ_music(BZ_channel, play_now->sheet[i].pitch, play_now->sheet[i].octave);
 							}
-							j++;
+							vTaskDelay(play_now->ring_time / portTICK_PERIOD_MS);
+							if (!play_now->sheet[i].joined)  //if not joined note
+							{
+								ledcWrite(BZ_channel, 0);
+							}
+							/*
+							j = 0;
+							while (j < 8)
+							{
+								if (play_now->sheet[i].note >> j == 0x01)
+								{
+									break;
+								}
+								j++;
+							}
+							*/
+							switch(play_now->sheet[i].note)
+							{
+								case 32:
+									j = 5;
+									break;
+								case 16:
+									j = 4;
+									break;
+								case 8:
+									j = 3;
+									break;
+								case 4:
+									j = 2;
+									break;
+								case 2:
+									j = 1;
+									break;
+								case 1:
+									j = 0;
+									break;
+							}
+							vTaskDelay((play_now->note[j] < play_now->ring_time) ? 0 : ((play_now->note[j] - play_now->ring_time) / portTICK_PERIOD_MS));
 						}
-						*/
-						switch(play_now->sheet[i].note)
-						{
-							case 32:
-								j = 5;
-								break;
-							case 16:
-								j = 4;
-								break;
-							case 8:
-								j = 3;
-								break;
-							case 4:
-								j = 2;
-								break;
-							case 2:
-								j = 1;
-								break;
-							case 1:
-								j = 0;
-								break;
-						}
-						vTaskDelay((play_now->note[j] - play_now->ring_time) / portTICK_PERIOD_MS);
 					}
 					Protogen.music_playing = 0;
 				}
@@ -741,7 +744,7 @@ void Ctrl_task(void * parameter)
 								cnt.Beep = 0;
 								if(!Protogen.music_playing)
 								{
-									BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
+									BZ_mode(BZ_mode_beep + (Protogen.Beep_mode != 5 ? Protogen.Beep_mode : 1));
 								}
 							}
 							else
@@ -756,7 +759,7 @@ void Ctrl_task(void * parameter)
 					}
 				}
 
-				if(Protogen.Protosence_flag)
+				if(Protogen.Protosence_flag && !Protogen.music_playing && !Protogen.animate_on)
 				{
 					if (cnt.Protosence >= Protosence_scan_cycle)
 					{
@@ -785,6 +788,19 @@ void Ctrl_task(void * parameter)
 					{
 						booped++;
 					}
+				}
+				else if(IR_send_toggle || booped || cnt.Protosence)
+				{
+					booped = 0;
+					cnt.Protosence = 0;
+					IR_send_toggle = 0;
+					IR_send_pwm(0);
+					if(!Protogen.animate_on)
+					{
+						Eye_mode(Eye_mode_general);
+						Nose_mode(Nose_mode_general);
+					}
+
 				}
 
 				if (Protogen.animate_on && *Face_current.animate_time)
@@ -852,6 +868,9 @@ void BLE_task(void * parameter)
 						switch (BLE_cmd[BLE_buffer_index] & 0xF0)
 						{
 						case 0x00:	//Beep and music
+							Protogen.music_playing = 0;
+							vTaskResume(BZ_task_handle);
+							vTaskDelay(5 / portTICK_PERIOD_MS);
 							BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
 							break;
 						case 0x10:	//mode
@@ -957,13 +976,17 @@ void BLE_task(void * parameter)
 						case 0xF0:	//save or reset
 							if (BLE_cmd[BLE_buffer_index] == 0x1FF)	//Reset
 							{
-								BZ_mode(BZ_mode_reset);
 								System_Reset();
+								vTaskDelay(5 / portTICK_PERIOD_MS);
+								BZ_mode(BZ_mode_reset);
 								matrix_face_set(face_ptr_rack[Protogen.Startup_Face]);
 								Matrix_mode(Matrix_mode_scan + *Face_current.animate_mode);
 							}
 							else if (BLE_cmd[BLE_buffer_index] == 0x1F0)	//Save
 							{
+								Protogen.music_playing = 0;
+								vTaskResume(BZ_task_handle);
+								vTaskDelay(5 / portTICK_PERIOD_MS);
 								BZ_mode(BZ_mode_save);
 								EEPROM_Save();
 								cnt.Blink = 0;
@@ -977,13 +1000,18 @@ void BLE_task(void * parameter)
 
 					case CMD_Face:	//Face
 						matrix_face_set(face_ptr_rack[BLE_cmd[BLE_buffer_index] & 0xFF]);
-						BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
+						Protogen.music_playing = 0;
+						vTaskResume(BZ_task_handle);
+						vTaskDelay(5 / portTICK_PERIOD_MS);
+						BZ_mode(BZ_mode_beep + (Protogen.Beep_mode != 5 ? Protogen.Beep_mode : 1));
+						vTaskResume(Neopixel_task_handle);
 						Matrix_mode(Matrix_mode_scan + *Face_current.animate_mode);
 						Neopixel_mode(Neopixel_mode_set);
 						break;
 
 					case CMD_Neo_pixel:
 						Protogen.Neo_Brightness = BLE_cmd[BLE_buffer_index] & 0xFF;
+						vTaskResume(Neopixel_task_handle);
 						Neopixel_mode(Neopixel_mode_Brightness);
 						break;
 					}

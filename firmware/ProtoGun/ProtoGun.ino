@@ -287,6 +287,7 @@ void ADC_task(void * parameter)
 					Blaster.Power_Break = 0;
 				}
 				Blaster.Battery = (Blaster.ADC_value - Battery_level.Break) * 5 / (Battery_level.Full - Battery_level.Break);
+				serial_log("Bat_L", Blaster.Battery);
 				LCD_refresh_cnt.ADC = 1;
 				vTaskDelay(ADC_pause_time / portTICK_PERIOD_MS);
 				ADC_mode(ADC_mode_general);
@@ -476,7 +477,7 @@ void GUI_task(void * parameter)
 				if (Get_But(&But_X))
 				{
 					VM_mode(VM_mode_on_long);
-					if(ProtoGun_setCMD(Face_cmd[Blaster.Face_index]))
+					if(!toggled ? ProtoGun_setCMD(Face_cmd[Blaster.Face_toggle_index]) : ProtoGun_setCMD(Face_cmd[Face_toggle_temp]))
 					{
 						serial_log(0, "Toggle face");
 						if (!toggled)
@@ -1490,14 +1491,14 @@ void GUI_task(void * parameter)
 				//first in last out
 
 				if (ProtoGun_setCMD(0x1F0) &&												//Svae
-					ProtoGun_setCMD(0x030 + Blaster.Beep_period) &&							//Period
-					ProtoGun_setCMD(0x010 + Blaster.Beep_mode) &&							//Mode
-					ProtoGun_setCMD(0x140 + (Blaster.Boop & 0x01)) &&						//Boop
-					ProtoGun_setCMD(0x130 + Blaster.Blink_period) &&						//Blink_period
-					ProtoGun_setCMD(0x110 + (Blaster.Face_startup_index & 0x0F)) &&			//Starup face_L
-					ProtoGun_setCMD(0x120 + ((Blaster.Face_startup_index >> 4) & 0x0F)) &&	//Starup face_H
-					ProtoGun_setCMD(0x100 + Blaster.Matrix_Brightness) &&					//Matrix Brightness
-					ProtoGun_setCMD(0x300 + Blaster.Neo_Brightness))						//Neo_Brightness
+					ProtoGun_setCMD(0x030 | Blaster.Beep_period) &&							//Period
+					ProtoGun_setCMD(0x010 | Blaster.Beep_mode) &&							//Mode
+					ProtoGun_setCMD(Blaster.Boop ? 0x141 : 0x140) &&						//Boop
+					ProtoGun_setCMD(0x130 | Blaster.Blink_period) &&						//Blink_period
+					ProtoGun_setCMD(0x110 | (Blaster.Face_startup_index & 0x0F)) &&			//Starup face_L
+					ProtoGun_setCMD(0x120 | ((Blaster.Face_startup_index >> 4) & 0x0F)) &&	//Starup face_H
+					ProtoGun_setCMD(0x100 | Blaster.Matrix_Brightness) &&					//Matrix Brightness
+					ProtoGun_setCMD(0x300 | Blaster.Neo_Brightness))						//Neo_Brightness
 				{
 					tft.printf("\n Saving");
 					BLE_mode(BLE_mode_notify);

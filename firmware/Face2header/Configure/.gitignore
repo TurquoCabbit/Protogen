@@ -2,5 +2,5 @@
 *
 # Except this file
 !.gitignore
-!*Music_Sheet.xlsx
+!Music_Sheet.xlsx
 !Template.xlsx
