@@ -459,7 +459,7 @@ void GUI_task(void * parameter)
 				if (Get_But(&But_Enter))
 				{
 					VM_mode(VM_mode_on_long);
-					if(ProtoGun_setCMD(Face_cmd[Blaster.Face_index]))
+					if(ProtoGun_setCMD(Face_cmd[Face_show_index]))
 					{
 						serial_log(0, "Set face");
 						Blaster.Face_index = Face_show_index;
