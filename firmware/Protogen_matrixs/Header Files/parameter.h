@@ -211,7 +211,6 @@ typedef struct _music
 	uint16_t tempo;
 	uint16_t length;
 	uint16_t note[6];
-	uint8_t ring_time;
 };
 
 typedef struct _cnt

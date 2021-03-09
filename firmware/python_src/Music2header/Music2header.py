@@ -75,7 +75,7 @@ for ws in range(2 ,work_sheet_num):
     work_sheet = wb[wb.worksheets[ws].title]
     music_name = work_sheet['J1'].value
     tempo = work_sheet['L2'].value
-    ring_time = work_sheet['L3'].value
+    # ring_time = work_sheet['L3'].value
     length = work_sheet['L4'].value
 
     if work_sheet['K12'].value == 'OFF':
@@ -110,7 +110,7 @@ for ws in range(2 ,work_sheet_num):
     file_music.write('\t\t{},\t\t//16th\n'.format(15000 // tempo))
     file_music.write('\t\t{},\t\t\t//32th\n'.format(7500 // tempo))
     file_music.write('\t},\n')
-    file_music.write('\t{},\n'.format(ring_time))
+    # file_music.write('\t{},\n'.format(ring_time))
     file_music.write('};\n\n')
     progress_change(music_name, 100)
     print('')

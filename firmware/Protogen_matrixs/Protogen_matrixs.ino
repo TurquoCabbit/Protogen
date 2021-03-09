@@ -623,22 +623,7 @@ void BZ_task(void * parameter)
 							{
 								BZ_music(BZ_channel, play_now->sheet[i].pitch, play_now->sheet[i].octave);
 							}
-							vTaskDelay(play_now->ring_time / portTICK_PERIOD_MS);
-							if (!play_now->sheet[i].joined)  //if not joined note
-							{
-								ledcWrite(BZ_channel, 0);
-							}
-							/*
-							j = 0;
-							while (j < 8)
-							{
-								if (play_now->sheet[i].note >> j == 0x01)
-								{
-									break;
-								}
-								j++;
-							}
-							*/
+							
 							switch(play_now->sheet[i].note)
 							{
 								case 32:
@@ -660,7 +645,14 @@ void BZ_task(void * parameter)
 									j = 0;
 									break;
 							}
-							vTaskDelay((play_now->note[j] < play_now->ring_time) ? 0 : ((play_now->note[j] - play_now->ring_time) / portTICK_PERIOD_MS));
+							vTaskDelay(play_now->note[j] / 2 / portTICK_PERIOD_MS);
+
+							if (!play_now->sheet[i].joined)  //if not joined note
+							{
+								ledcWrite(BZ_channel, 0);
+							}
+
+							vTaskDelay(play_now->note[j] / 2 / portTICK_PERIOD_MS);
 						}
 					}
 					Protogen.music_playing = 0;
@@ -868,10 +860,19 @@ void BLE_task(void * parameter)
 						switch (BLE_cmd[BLE_buffer_index] & 0xF0)
 						{
 						case 0x00:	//Beep and music
-							Protogen.music_playing = 0;
-							vTaskResume(BZ_task_handle);
-							vTaskDelay(5 / portTICK_PERIOD_MS);
-							BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
+							if (Protogen.music_playing)
+							{	
+								Protogen.music_playing = 0;
+								vTaskResume(BZ_task_handle);
+								vTaskDelay(5 / portTICK_PERIOD_MS);
+								BZ_mode(BZ_mode_OFF);
+							}
+							else
+							{
+								vTaskResume(BZ_task_handle);
+								vTaskDelay(5 / portTICK_PERIOD_MS);
+								BZ_mode(BZ_mode_beep + Protogen.Beep_mode);
+							}
 							break;
 						case 0x10:	//mode
 							Protogen.Beep_mode = BLE_cmd[BLE_buffer_index] & 0x0F;
